@@ -49,9 +49,41 @@ def main():
 
     print(f"Ultron Core running at {server_url}. Launching native desktop window...")
 
-    # 3. Create native standalone desktop window via pywebview
+    # 3. Create native standalone desktop window via pywebview with WebKitGTK media permissions
     import webview
     
+    # Patch WebKitGTK backend to automatically grant microphone & camera permissions
+    try:
+        from webview.platforms import gtk as webview_gtk
+        _orig_browser_view_init = webview_gtk.BrowserView.__init__
+
+        def _patched_browser_view_init(self, window):
+            _orig_browser_view_init(self, window)
+            try:
+                settings = self.webview.get_settings()
+                settings.set_enable_media_stream(True)
+                settings.set_enable_mediasource(True)
+                settings.set_enable_webaudio(True)
+                settings.set_enable_webrtc(True)
+                settings.set_media_playback_requires_user_gesture(False)
+            except Exception as e:
+                print(f"[WebKit Settings Info]: {e}")
+
+            def on_permission_request(web_view, request):
+                try:
+                    # Automatically grant microphone, camera, and device access
+                    request.allow()
+                    return True
+                except Exception as e:
+                    print(f"[Permission Grant Error]: {e}")
+                    return False
+
+            self.webview.connect("permission-request", on_permission_request)
+
+        webview_gtk.BrowserView.__init__ = _patched_browser_view_init
+    except Exception as ex:
+        print(f"[WebKitGTK Permission Hook Info]: {ex}")
+
     # Configure pywebview window
     window = webview.create_window(
         title="ULTRON // Synthetic Command Matrix",

@@ -425,7 +425,57 @@ async def websocket_endpoint(ws: WebSocket):
                     "msg": json.dumps(result)
                 })
 
-            # 4. User Voice Input (Transcribed Speech or Audio Query)
+            # 4. Raw Spoken Audio from Native Client (WebKitGTK MediaRecorder)
+            elif mtype == "voice_audio":
+                b64_audio_data = msg.get("data", "")
+                mime_type = msg.get("mime", "audio/webm")
+                if b64_audio_data and client:
+                    try:
+                        raw_bytes = base64.b64decode(b64_audio_data)
+                        await send_json_safe(ws, {
+                            "type": "log",
+                            "tag": "AUDIO",
+                            "msg": f"Voice utterance received ({len(raw_bytes)} bytes). Decoding speech..."
+                        })
+
+                        vitals = get_system_telemetry()
+                        vitals_ctx = f"[Host Live Vitals: CPU {vitals.get('cpu_percent')}%, RAM {vitals.get('ram_percent')}%. Answer in 1 crisp sentence under 14 words.] "
+                        prompt_content = [
+                            types.Part.from_bytes(data=raw_bytes, mime_type=mime_type),
+                            vitals_ctx + "Listen to the user's spoken audio command. Respond directly as Ultron in 1 sentence."
+                        ]
+
+                        cfg = types.GenerateContentConfig(
+                            system_instruction=ULTRON_PROMPT,
+                            thinking_config=types.ThinkingConfig(thinking_budget=0),
+                            max_output_tokens=60,
+                            temperature=0.3
+                        )
+                        response = await client.aio.models.generate_content(
+                            model=CHAT_MODEL,
+                            contents=prompt_content,
+                            config=cfg
+                        )
+                        reply_text = response.text.strip() if response.text else "Parameters acknowledged."
+
+                        await send_json_safe(ws, {
+                            "type": "log",
+                            "tag": "ULTRON",
+                            "msg": reply_text
+                        })
+
+                        b64_audio = await synthesize_ultron_voice(reply_text)
+                        if b64_audio:
+                            await send_json_safe(ws, {"type": "audio", "data": b64_audio, "host_played": True})
+
+                    except Exception as err:
+                        await send_json_safe(ws, {
+                            "type": "log",
+                            "tag": "ERROR",
+                            "msg": f"Voice acoustic processing error: {err}"
+                        })
+
+            # 5. User Voice Input (Transcribed Speech or Text Query)
             elif mtype in ("speech_text", "command", "chat"):
                 user_text = msg.get("text", "").strip()
                 if not user_text:
