@@ -1,0 +1,1319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ultron // Synthetic Command Matrix</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Reset & Base System */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #050507;
+      color: #fafafa;
+      user-select: none;
+    }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: #070709; }
+    ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
+
+    /* Root Grid Layout */
+    .app-root {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      background-color: #050507;
+    }
+
+    /* Top Navigation Header */
+    .top-header {
+      height: 52px;
+      flex-shrink: 0;
+      border-bottom: 1px solid rgba(39, 39, 42, 0.85);
+      background-color: rgba(9, 9, 11, 0.95);
+      backdrop-filter: blur(12px);
+      padding: 0 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 30;
+    }
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .status-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background-color: #10b981;
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.6);
+      animation: pulseGreen 2s infinite;
+      transition: background-color 0.3s ease;
+    }
+    @keyframes pulseGreen {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(0.9); }
+    }
+    .brand-title {
+      font-size: 0.875rem;
+      font-weight: 800;
+      letter-spacing: 0.15em;
+      color: #ffffff;
+    }
+    .brand-sub {
+      font-size: 0.6875rem;
+      letter-spacing: 0.08em;
+      color: rgba(239, 68, 68, 0.9);
+      margin-left: 0.5rem;
+    }
+    .badge-pill {
+      font-size: 0.6875rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      border: 1px solid #27272a;
+      background-color: #18181b;
+      color: #a1a1aa;
+    }
+
+    /* Header Controls */
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.38rem 0.8rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      outline: none;
+      border: none;
+    }
+    .btn-red {
+      background: linear-gradient(180deg, #dc2626 0%, #b91c1c 100%);
+      color: #ffffff;
+      border: 1px solid rgba(239, 68, 68, 0.6);
+      box-shadow: 0 2px 8px rgba(220, 38, 38, 0.35);
+    }
+    .btn-red:hover {
+      background: linear-gradient(180deg, #ef4444 0%, #dc2626 100%);
+      box-shadow: 0 3px 12px rgba(239, 68, 68, 0.5);
+    }
+    .btn-dark {
+      background-color: #18181b;
+      color: #d4d4d8;
+      border: 1px solid #27272a;
+    }
+    .btn-dark:hover {
+      background-color: #27272a;
+      color: #ffffff;
+      border-color: #3f3f46;
+    }
+
+    /* Main Grid Workspace */
+    .main-workspace {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      height: calc(100vh - 52px);
+      overflow: hidden;
+    }
+    @media (max-width: 1024px) {
+      .main-workspace {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+        overflow-y: auto;
+      }
+    }
+
+    /* Left Sidebar: Telemetry & Controls */
+    .left-sidebar {
+      border-right: 1px solid rgba(39, 39, 42, 0.85);
+      background-color: rgba(9, 9, 11, 0.65);
+      padding: 1.15rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow-y: auto;
+      gap: 1rem;
+    }
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+    }
+    .panel-title {
+      font-size: 0.6875rem;
+      font-weight: 700;
+      color: #a1a1aa;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    /* Equalizer Box */
+    .eq-box {
+      height: 74px;
+      border-radius: 8px;
+      border: 1px solid #27272a;
+      background-color: rgba(24, 24, 27, 0.4);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .eq-box:hover {
+      border-color: #3f3f46;
+      background-color: rgba(39, 39, 42, 0.3);
+    }
+    .eq-bars {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      height: 28px;
+    }
+    .eq-bar {
+      width: 4px;
+      background-color: #52525b;
+      border-radius: 9999px;
+      transition: height 0.08s ease, background-color 0.1s ease;
+    }
+
+    /* Camera Feed Box */
+    .camera-box {
+      height: 124px;
+      border-radius: 8px;
+      border: 1px solid #27272a;
+      background-color: rgba(24, 24, 27, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+    .camera-video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Progress Meters */
+    .meter-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      margin-bottom: 0.25rem;
+    }
+    .meter-track {
+      width: 100%;
+      height: 6px;
+      background-color: #18181b;
+      border-radius: 9999px;
+      overflow: hidden;
+      border: 1px solid #27272a;
+      margin-bottom: 0.65rem;
+    }
+    .meter-fill {
+      height: 100%;
+      transition: width 0.3s ease;
+    }
+
+    /* Right Avatar Stage */
+    .avatar-stage-section {
+      display: flex;
+      flex-direction: column;
+      background-color: #050507;
+      overflow: hidden;
+      position: relative;
+    }
+    .stage-top-bar {
+      height: 36px;
+      flex-shrink: 0;
+      border-bottom: 1px solid rgba(39, 39, 42, 0.75);
+      background-color: rgba(9, 9, 11, 0.75);
+      backdrop-filter: blur(8px);
+      padding: 0 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 20;
+    }
+
+    .stage-viewport {
+      flex: 1;
+      height: calc(100% - 36px);
+      width: 100%;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background: radial-gradient(circle at center, #121217 0%, #09090b 65%, #050507 100%);
+    }
+
+    /* The Centerpiece: Ultron Face Fills That Space Fully (Pure Metallic, Zero Red Lights) */
+    .ultron-tilt-wrap {
+      height: 86%;
+      max-height: 760px;
+      aspect-ratio: 419 / 500;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      transition: transform 0.1s ease-out;
+      transform-style: preserve-3d;
+    }
+    .ultron-avatar-box {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .ultron-mask-img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      user-select: none;
+      pointer-events: none;
+      filter: drop-shadow(0 25px 50px rgba(0, 0, 0, 0.88));
+      transition: filter 0.2s ease;
+    }
+
+    /* Multi-Harmonic Idle Floating Breathing */
+    @keyframes ultronFloat {
+      0%, 100% {
+        transform: translateY(0px) rotate(0deg);
+      }
+      33% {
+        transform: translateY(-8px) rotate(0.35deg);
+      }
+      66% {
+        transform: translateY(5px) rotate(-0.3deg);
+      }
+    }
+    .float-idle {
+      animation: ultronFloat 5.2s ease-in-out infinite;
+    }
+
+    /* Concentric Rotary HUD Rings */
+    @keyframes spinClockwise {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    @keyframes spinCounter {
+      from { transform: rotate(360deg); }
+      to { transform: rotate(0deg); }
+    }
+    .hud-ring-1 {
+      animation: spinClockwise 34s linear infinite;
+    }
+    .hud-ring-2 {
+      animation: spinCounter 24s linear infinite;
+    }
+    .hud-ring-3 {
+      animation: spinClockwise 48s linear infinite;
+    }
+
+    /* Soundwave Ripples (Neutral metallic) */
+    @keyframes waveRipple {
+      0% { transform: scale(0.85); opacity: 0.6; }
+      100% { transform: scale(1.45); opacity: 0; }
+    }
+    .shockwave-active {
+      animation: waveRipple 1.1s ease-out infinite;
+    }
+
+    /* Floating Collapsible HUD Console Drawer */
+    .hud-drawer-container {
+      position: absolute;
+      bottom: 12px;
+      left: 18px;
+      right: 18px;
+      z-index: 30;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .hud-dock-bar {
+      padding: 0.5rem 0.85rem;
+      border-radius: 8px;
+      background-color: rgba(12, 12, 16, 0.92);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(63, 63, 70, 0.7);
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
+    }
+    .hud-dock-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .hud-input-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .hud-input {
+      flex: 1;
+      height: 32px;
+      border-radius: 6px;
+      background-color: #18181b;
+      border: 1px solid #27272a;
+      color: #fafafa;
+      padding: 0 0.75rem;
+      font-size: 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+      outline: none;
+      transition: border-color 0.15s ease;
+    }
+    .hud-input:focus {
+      border-color: #52525b;
+      background-color: #202024;
+    }
+    .hud-input::placeholder {
+      color: #71717a;
+    }
+    .hud-chip {
+      font-size: 0.625rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      border: 1px solid #27272a;
+      background-color: #18181b;
+      color: #a1a1aa;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .hud-chip:hover {
+      background-color: #27272a;
+      color: #ffffff;
+      border-color: #3f3f46;
+    }
+    .hud-expanded-body {
+      margin-top: 8px;
+      height: 250px;
+      border-radius: 8px;
+      background-color: rgba(9, 9, 13, 0.96);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(63, 63, 70, 0.75);
+      padding: 0.85rem;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.85);
+    }
+    .log-stream {
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 4px;
+      font-size: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    .log-row {
+      display: flex;
+      gap: 0.75rem;
+      line-height: 1.4;
+      border-bottom: 1px solid rgba(39, 39, 42, 0.4);
+      padding-bottom: 0.3rem;
+      align-items: flex-start;
+    }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+  <div class="app-root">
+
+    <!-- Top Navigation Header -->
+    <header class="top-header">
+      <div class="header-brand">
+        <span id="status-dot" class="status-dot"></span>
+        <div style="display: flex; align-items: baseline;">
+          <span class="brand-title">ULTRON</span>
+          <span class="brand-sub">COMMAND MATRIX</span>
+        </div>
+        <span id="model-tag" class="badge-pill mono" style="margin-left: 0.75rem;">
+          gemini-3.5-flash // Fenrir
+        </span>
+      </div>
+
+      <!-- Quick Action Controls -->
+      <div class="header-actions">
+        <button id="mic-toggle-btn" onclick="toggleAudio()" class="btn btn-red">
+          <span id="mic-dot" style="width: 7px; height: 7px; border-radius: 50%; background-color: #fbbf24;"></span>
+          <span id="mic-btn-label">Engage Voice</span>
+        </button>
+
+        <button id="cam-toggle-btn" onclick="toggleCamera()" class="btn btn-dark">
+          <span id="cam-dot" style="width: 7px; height: 7px; border-radius: 50%; background-color: #52525b;"></span>
+          <span id="cam-btn-label">Optical: Off</span>
+        </button>
+
+        <div style="width: 1px; height: 16px; background-color: #27272a; margin: 0 4px;"></div>
+
+        <button id="reconnect-btn" onclick="reconnectWebSocket()" class="btn btn-dark">
+          Reconnect
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="main-workspace">
+      
+      <!-- Left Sidebar: Controls & Host Telemetry -->
+      <section class="left-sidebar">
+        
+        <!-- Voice Presence Equalizer -->
+        <div>
+          <div class="panel-header">
+            <span class="panel-title">Voice Presence</span>
+            <span id="voice-state-badge" class="badge-pill mono" style="color: #fbbf24; border-color: rgba(251, 191, 36, 0.3);">
+              AWAITING MIC
+            </span>
+          </div>
+
+          <div onclick="toggleAudio()" class="eq-box" title="Click to engage/disengage voice input">
+            <div id="bars" class="eq-bars">
+              <div class="eq-bar" style="height: 8px;"></div>
+              <div class="eq-bar" style="height: 16px;"></div>
+              <div class="eq-bar" style="height: 24px;"></div>
+              <div class="eq-bar" style="height: 16px;"></div>
+              <div class="eq-bar" style="height: 8px;"></div>
+            </div>
+            <span id="audio-hint" class="mono" style="font-size: 0.6875rem; color: #71717a; margin-top: 6px;">
+              Click to activate voice duplex
+            </span>
+          </div>
+        </div>
+
+        <!-- Optical Sensor (1 FPS) -->
+        <div>
+          <div class="panel-header">
+            <span class="panel-title">Optical Sensor</span>
+            <div style="display: flex; gap: 4px;">
+              <button onclick="inspectOpticalFeed()" class="hud-chip mono" style="padding: 0.1rem 0.4rem;">Inspect</button>
+              <span id="cam-state-badge" class="badge-pill mono">STANDBY</span>
+            </div>
+          </div>
+
+          <div class="camera-box" onclick="toggleCamera()" style="cursor: pointer;" title="Click to toggle optical camera">
+            <video id="video-preview" autoplay playsinline muted class="camera-video hidden"></video>
+            <canvas id="frame-canvas" width="480" height="360" class="hidden"></canvas>
+            <div id="cam-placeholder" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #52525b;">
+              <svg style="width: 22px; height: 22px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
+              <span class="mono" style="font-size: 0.6875rem;">CLICK TO ENGAGE CAMERA</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hardware Telemetry Dashboard -->
+        <div style="border-top: 1px solid rgba(39, 39, 42, 0.85); padding-top: 0.85rem;">
+          <div class="panel-header">
+            <span class="panel-title">Host Telemetry</span>
+            <span id="os-label" class="mono" style="font-size: 0.6875rem; color: #a1a1aa;">Detecting...</span>
+          </div>
+          
+          <div style="margin-top: 0.5rem;">
+            <div>
+              <div class="meter-row mono">
+                <span style="color: #a1a1aa;">CPU LOAD</span>
+                <span id="cpu-val" style="color: #ffffff;">0%</span>
+              </div>
+              <div class="meter-track">
+                <div id="cpu-bar" class="meter-fill" style="width: 0%; background-color: #ef4444;"></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="meter-row mono">
+                <span style="color: #a1a1aa;">MEMORY</span>
+                <span id="ram-val" style="color: #ffffff;">0 / 0 GB (0%)</span>
+              </div>
+              <div class="meter-track">
+                <div id="ram-bar" class="meter-fill" style="width: 0%; background-color: #d4d4d8;"></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="meter-row mono">
+                <span style="color: #a1a1aa;">ROOT DISK</span>
+                <span id="disk-val" style="color: #ffffff;">0 / 0 GB (0%)</span>
+              </div>
+              <div class="meter-track">
+                <div id="disk-bar" class="meter-fill" style="width: 0%; background-color: #a1a1aa;"></div>
+              </div>
+            </div>
+
+            <div style="margin-top: 0.5rem;">
+              <div class="mono" style="font-size: 0.625rem; color: #71717a; text-transform: uppercase; margin-bottom: 4px;">Top Processes</div>
+              <div id="proc-list" class="mono" style="font-size: 0.6875rem; display: flex; flex-direction: column; gap: 3px;">
+                <div style="display: flex; justify-content: space-between; color: #71717a; font-size: 0.625rem;">
+                  <span>NAME</span>
+                  <span>RAM %</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- Right Column: The Real Ultron Face Filling That Space Fully & Animated -->
+      <section id="ultron-stage-section" class="avatar-stage-section">
+        
+        <!-- Stage Top Bar -->
+        <div class="stage-top-bar">
+          <div style="display: flex; align-items: center; gap: 0.6rem;">
+            <span style="width: 8px; height: 8px; border-radius: 50%; background-color: #10b981; box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);"></span>
+            <span style="font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.12em; color: #d4d4d8;">AVATAR MATRIX // FULL STAGE</span>
+            <span id="speech-state-badge" class="badge-pill mono" style="margin-left: 0.5rem;">
+              CORE ACTIVE // STANDBY
+            </span>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <button onclick="toggleLogDrawer()" id="hud-toggle-btn" class="btn btn-dark" style="padding: 0.25rem 0.6rem; font-size: 0.6875rem;">
+              <span id="hud-toggle-icon">▲</span>
+              <span id="hud-toggle-label">Logs HUD</span>
+            </button>
+            <button onclick="clearLogs()" class="btn btn-dark" style="padding: 0.25rem 0.6rem; font-size: 0.6875rem; color: #71717a;">
+              Clear
+            </button>
+          </div>
+        </div>
+
+        <!-- Main Visual Stage Viewport -->
+        <div id="stage-viewport" class="stage-viewport">
+          
+          <!-- Subtle Neutral Ambient Vignette (No Red Light) -->
+          <div id="ambient-aura" style="position: absolute; width: 620px; height: 620px; border-radius: 50%; background-color: rgba(255, 255, 255, 0.03); filter: blur(140px); pointer-events: none; transition: all 0.3s ease;"></div>
+
+          <!-- Rotary Concentric Neutral HUD Rings -->
+          <div class="hud-ring-1" style="position: absolute; width: 600px; height: 600px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.06); pointer-events: none;"></div>
+          <div class="hud-ring-2" style="position: absolute; width: 500px; height: 500px; border-radius: 50%; border: 1px dashed rgba(255, 255, 255, 0.05); pointer-events: none;"></div>
+          <div class="hud-ring-3" style="position: absolute; width: 420px; height: 420px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.08); pointer-events: none;"></div>
+
+          <!-- Soundwave Shockwave Ring (Subtle Neutral) -->
+          <div id="shockwave-ring" style="position: absolute; width: 480px; height: 480px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.2); opacity: 0; pointer-events: none;"></div>
+
+          <!-- 3D Cursor Tracking Parallax Container -->
+          <div id="ultron-tilt-container" class="ultron-tilt-wrap">
+            
+            <!-- Breathing Idle Avatar Container -->
+            <div id="ultron-avatar-container" class="ultron-avatar-box float-idle">
+              
+              <!-- Pure Real Ultron Face Mask (Clean Metallic, No Red Lights) -->
+              <img 
+                id="ultron-face-img" 
+                src="static/ultron_face.png" 
+                alt="Ultron Prime" 
+                class="ultron-mask-img"
+              />
+
+            </div>
+
+          </div>
+
+          <!-- Futuristic HUD Telemetry Corner Brackets -->
+          <div style="position: absolute; top: 1rem; left: 1.5rem; font-size: 0.625rem; color: #71717a; pointer-events: none; display: flex; flex-direction: column; gap: 3px;" class="mono">
+            <div style="color: #a1a1aa; font-weight: 700; letter-spacing: 0.05em;">ULTRON // PRIME ARTIFICIAL SENTIENCE</div>
+            <div>SYNTHESIS: FENRIR 24KHZ PCM // ADAPTIVE REASONING</div>
+          </div>
+
+          <div style="position: absolute; top: 1rem; right: 1.5rem; font-size: 0.625rem; color: #71717a; pointer-events: none; text-align: right; display: flex; flex-direction: column; gap: 3px;" class="mono">
+            <div>PARALLAX: 3D HEAD TRACKING [ACTIVE]</div>
+            <div style="color: #a1a1aa; font-weight: 600;">STATUS: FULL OPERATIONAL</div>
+          </div>
+
+          <!-- Bottom Floating HUD Console Drawer -->
+          <div id="hud-drawer" class="hud-drawer-container">
+            
+            <!-- Compact Dock Bar with Ticker & Quick Actions -->
+            <div class="hud-dock-bar">
+              <div class="hud-dock-top">
+                <div style="display: flex; align-items: center; gap: 0.75rem; overflow: hidden; flex: 1; margin-right: 1rem;">
+                  <span id="drawer-dot" style="width: 7px; height: 7px; border-radius: 50%; background-color: #10b981; flex-shrink: 0;"></span>
+                  <span class="mono" style="font-size: 0.6875rem; color: #71717a; flex-shrink: 0; text-transform: uppercase;">LATEST:</span>
+                  <span id="hud-ticker-text" class="mono" style="font-size: 0.75rem; color: #e4e4e7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Ultron command matrix online and ready.</span>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 0.4rem; flex-shrink: 0;">
+                  <button onclick="sendDiagnosticCommand('get_system_telemetry')" class="hud-chip mono">Vitals</button>
+                  <button onclick="sendDiagnosticCommand('get_process_list')" class="hud-chip mono">Processes</button>
+                  <button onclick="sendShellCommand('df -h /')" class="hud-chip mono">Disk</button>
+                  <button onclick="sendShellCommand('free -m')" class="hud-chip mono">RAM</button>
+                  <button onclick="toggleLogDrawer()" id="drawer-toggle-btn" class="btn btn-dark" style="padding: 0.25rem 0.6rem; font-size: 0.6875rem; font-family: monospace;">
+                    Expand Logs
+                  </button>
+                </div>
+              </div>
+
+              <!-- Interactive Text / Command Input Bar -->
+              <div class="hud-input-row">
+                <input 
+                  type="text" 
+                  id="hud-cmd-input" 
+                  class="hud-input" 
+                  placeholder="Ask Ultron a question or enter a terminal command..." 
+                  onkeydown="handleInputKey(event)"
+                />
+                <button onclick="transmitInput()" class="btn btn-red" style="padding: 0.35rem 0.8rem; height: 32px;">
+                  Transmit
+                </button>
+                <button onclick="transmitShell()" class="btn btn-dark" style="padding: 0.35rem 0.8rem; height: 32px;" title="Execute directly in bash">
+                  Shell
+                </button>
+              </div>
+            </div>
+
+            <!-- Expanded Full Terminal Stream (Collapsible) -->
+            <div id="hud-expanded-body" class="hud-expanded-body hidden">
+              <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #27272a; padding-bottom: 0.5rem; margin-bottom: 0.5rem;">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                  <span style="font-size: 0.6875rem; font-weight: 700; color: #a1a1aa; text-transform: uppercase;">System Execution Logs</span>
+                  <div style="display: flex; gap: 4px;" class="mono">
+                    <button onclick="setFilter('all')" id="filter-all" class="badge-pill" style="cursor: pointer; background-color: #27272a; color: #fafafa;">ALL</button>
+                    <button onclick="setFilter('dialogue')" id="filter-dialogue" class="badge-pill" style="cursor: pointer;">DIALOGUE</button>
+                    <button onclick="setFilter('tools')" id="filter-tools" class="badge-pill" style="cursor: pointer;">TOOLS</button>
+                  </div>
+                </div>
+                <button onclick="clearLogs()" class="mono" style="font-size: 0.6875rem; color: #71717a; background: none; border: none; cursor: pointer;">Clear</button>
+              </div>
+
+              <div id="log-container" class="log-stream mono">
+                <div class="log-row" style="color: #52525b;">
+                  <span style="width: 6px; height: 6px; border-radius: 50%; background-color: #10b981; margin-top: 5px;"></span>
+                  <span>System matrix active. Monitoring host vitals.</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+    </main>
+
+  </div>
+
+  <script>
+    let ws = null;
+    let audioCtx = null;
+    let mediaStream = null;
+    let videoStream = null;
+    let camInterval = null;
+    let nextPlayTime = 0;
+    let activeSources = [];
+    let currentFilter = 'all';
+    let speechRecognizer = null;
+
+    // Audio Analysis for Real-time Speech Articulation
+    let playbackCtx = null;
+    let playbackAnalyser = null;
+    let animFrameId = null;
+
+    // Elements
+    const logBox = document.getElementById('log-container');
+    const bars = document.getElementById('bars').children;
+    const ultronTiltContainer = document.getElementById('ultron-tilt-container');
+    const ultronAvatarContainer = document.getElementById('ultron-avatar-container');
+    const ultronFaceImg = document.getElementById('ultron-face-img');
+    const ambientAura = document.getElementById('ambient-aura');
+    const shockwaveRing = document.getElementById('shockwave-ring');
+    const speechStateBadge = document.getElementById('speech-state-badge');
+    const hudTickerText = document.getElementById('hud-ticker-text');
+    const hudExpandedBody = document.getElementById('hud-expanded-body');
+    const drawerToggleBtn = document.getElementById('drawer-toggle-btn');
+    const hudToggleLabel = document.getElementById('hud-toggle-label');
+    const hudToggleIcon = document.getElementById('hud-toggle-icon');
+    const hudCmdInput = document.getElementById('hud-cmd-input');
+
+    let isLogsExpanded = false;
+
+    // ----------------- Collapsible HUD Drawer -----------------
+    function toggleLogDrawer() {
+      isLogsExpanded = !isLogsExpanded;
+      if (isLogsExpanded) {
+        hudExpandedBody.classList.remove('hidden');
+        drawerToggleBtn.innerText = "Minimize Logs";
+        hudToggleLabel.innerText = "Hide Logs";
+        hudToggleIcon.innerText = "▼";
+        logBox.scrollTop = logBox.scrollHeight;
+      } else {
+        hudExpandedBody.classList.add('hidden');
+        drawerToggleBtn.innerText = "Expand Logs";
+        hudToggleLabel.innerText = "Logs HUD";
+        hudToggleIcon.innerText = "▲";
+      }
+    }
+
+    // ----------------- Interactive 3D Cursor Parallax -----------------
+    let targetTiltX = 0;
+    let targetTiltY = 0;
+    let currentTiltX = 0;
+    let currentTiltY = 0;
+
+    window.addEventListener('mousemove', (e) => {
+      const stage = document.getElementById('stage-viewport');
+      if (!stage) return;
+      const rect = stage.getBoundingClientRect();
+      const x = (e.clientX - (rect.left + rect.width / 2)) / (rect.width / 2);
+      const y = (e.clientY - (rect.top + rect.height / 2)) / (rect.height / 2);
+      const cx = Math.max(-1, Math.min(1, x));
+      const cy = Math.max(-1, Math.min(1, y));
+      targetTiltY = cx * 14;  // Rotate around Y axis (look left/right)
+      targetTiltX = -cy * 10; // Rotate around X axis (look up/down)
+    });
+
+    window.addEventListener('mouseleave', () => {
+      targetTiltX = 0;
+      targetTiltY = 0;
+    });
+
+    // ----------------- Filter System -----------------
+    function setFilter(type) {
+      currentFilter = type;
+      ['all', 'dialogue', 'tools'].forEach(f => {
+        const btn = document.getElementById(`filter-${f}`);
+        if (!btn) return;
+        if (f === type) {
+          btn.style.backgroundColor = '#27272a';
+          btn.style.color = '#fafafa';
+        } else {
+          btn.style.backgroundColor = '#18181b';
+          btn.style.color = '#a1a1aa';
+        }
+      });
+      applyFilter();
+    }
+
+    function applyFilter() {
+      const items = logBox.querySelectorAll('[data-tag]');
+      items.forEach(el => {
+        const tag = el.getAttribute('data-tag');
+        if (currentFilter === 'all') {
+          el.style.display = 'flex';
+        } else if (currentFilter === 'dialogue') {
+          el.style.display = (tag === 'USER' || tag === 'ULTRON') ? 'flex' : 'none';
+        } else if (currentFilter === 'tools') {
+          el.style.display = (tag === 'TOOL_EXEC' || tag === 'TOOL_RET') ? 'flex' : 'none';
+        }
+      });
+    }
+
+    function addLog(tag, msg) {
+      const time = new Date().toLocaleTimeString('en-US', { hour12: false });
+      
+      // Update HUD bottom ticker
+      hudTickerText.innerText = `[${tag}] ${msg}`;
+
+      const row = document.createElement('div');
+      row.setAttribute('data-tag', tag);
+      row.className = "log-row";
+      
+      let tagColor = "#a1a1aa";
+      if (tag === "TOOL_EXEC") tagColor = "#fbbf24";
+      if (tag === "TOOL_RET") tagColor = "#34d399";
+      if (tag === "USER") tagColor = "#38bdf8";
+      if (tag === "ULTRON") tagColor = "#e4e4e7";
+      if (tag === "OPTICAL") tagColor = "#c084fc";
+      if (tag === "AUDIO") tagColor = "#60a5fa";
+      if (tag === "ERROR") tagColor = "#fb7185";
+
+      row.innerHTML = `
+        <span style="color: #52525b; flex-shrink: 0;">${time}</span>
+        <span style="color: ${tagColor}; font-weight: 600; flex-shrink: 0; width: 88px;">[${tag}]</span>
+        <span style="color: #e4e4e7; flex: 1; word-break: break-word;">${msg}</span>
+      `;
+      logBox.appendChild(row);
+      logBox.scrollTop = logBox.scrollHeight;
+      applyFilter();
+    }
+
+    function clearLogs() { 
+      logBox.innerHTML = ''; 
+    }
+
+    function animateBars(active) {
+      for (let bar of bars) {
+        if (active) {
+          const h = Math.floor(Math.random() * 20) + 6;
+          bar.style.height = `${h}px`;
+          bar.style.backgroundColor = '#10b981';
+        } else {
+          bar.style.height = "8px";
+          bar.style.backgroundColor = '#52525b';
+        }
+      }
+    }
+
+    // ----------------- Real-Time Ultron Facial Animation Loop (No Red Light) -----------------
+    function startAudioReactiveAnimation() {
+      if (animFrameId) return;
+
+      const freqData = new Uint8Array(32);
+
+      function renderFrame() {
+        // Smooth 3D tilt lerp
+        currentTiltX += (targetTiltX - currentTiltX) * 0.08;
+        currentTiltY += (targetTiltY - currentTiltY) * 0.08;
+
+        if (playbackAnalyser && activeSources.length > 0) {
+          playbackAnalyser.getByteFrequencyData(freqData);
+          let sum = 0;
+          for (let i = 0; i < freqData.length; i++) sum += freqData[i];
+          const avg = sum / freqData.length;
+          const intensity = Math.min(1, avg / 110);
+
+          // Combined 3D Tilt + Speech Resonance Pulse
+          const speechScale = 1.0 + (intensity * 0.035);
+          ultronTiltContainer.style.transform = `perspective(1200px) rotateX(${currentTiltX.toFixed(2)}deg) rotateY(${currentTiltY.toFixed(2)}deg) scale(${speechScale.toFixed(3)})`;
+          
+          // Pure metallic depth shadow (No red light)
+          ultronFaceImg.style.filter = 'drop-shadow(0 25px 50px rgba(0, 0, 0, 0.95))';
+
+          // Subtle acoustic shockwave
+          shockwaveRing.style.opacity = `${0.2 + intensity * 0.5}`;
+          shockwaveRing.classList.add('shockwave-active');
+
+          speechStateBadge.innerText = "SYNTHESIZING VOICE // SPEAKING";
+          speechStateBadge.style.color = "#38bdf8";
+          speechStateBadge.style.borderColor = "rgba(56, 189, 248, 0.4)";
+          speechStateBadge.style.backgroundColor = "rgba(12, 74, 110, 0.4)";
+        } else {
+          // Idle Animation State
+          ultronTiltContainer.style.transform = `perspective(1200px) rotateX(${currentTiltX.toFixed(2)}deg) rotateY(${currentTiltY.toFixed(2)}deg)`;
+          ultronFaceImg.style.filter = 'drop-shadow(0 20px 40px rgba(0, 0, 0, 0.85))';
+          ambientAura.style.backgroundColor = 'rgba(255, 255, 255, 0.03)';
+
+          shockwaveRing.style.opacity = '0';
+          shockwaveRing.classList.remove('shockwave-active');
+
+          if (mediaStream) {
+            speechStateBadge.innerText = "LISTENING // DUPLEX ACTIVE";
+            speechStateBadge.style.color = "#34d399";
+            speechStateBadge.style.borderColor = "rgba(16, 185, 129, 0.3)";
+            speechStateBadge.style.backgroundColor = "rgba(6, 78, 59, 0.4)";
+          } else {
+            speechStateBadge.innerText = "CORE ACTIVE // STANDBY";
+            speechStateBadge.style.color = "#a1a1aa";
+            speechStateBadge.style.borderColor = "#27272a";
+            speechStateBadge.style.backgroundColor = "rgba(24, 24, 27, 0.6)";
+          }
+        }
+        animFrameId = requestAnimationFrame(renderFrame);
+      }
+      renderFrame();
+    }
+
+    let reconnectAttempts = 0;
+    let reconnectTimer = null;
+
+    function initWebSocket() {
+      if (reconnectTimer) {
+        clearTimeout(reconnectTimer);
+        reconnectTimer = null;
+      }
+
+      const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+      ws = new WebSocket(`${proto}//${location.host}/ws`);
+
+      ws.onopen = () => {
+        reconnectAttempts = 0;
+        document.getElementById('status-dot').style.backgroundColor = "#10b981";
+        document.getElementById('drawer-dot').style.backgroundColor = "#10b981";
+        addLog("SYSTEM", "WebSocket connected. Ultron Command Matrix active.");
+      };
+
+      ws.onmessage = async (event) => {
+        try {
+          const msg = JSON.parse(event.data);
+
+          if (msg.type === "log") {
+            addLog(msg.tag, msg.msg);
+          } else if (msg.type === "connected") {
+            addLog("SYSTEM", msg.msg);
+          } else if (msg.type === "telemetry") {
+            updateTelemetry(msg.data, msg.processes);
+          } else if (msg.type === "audio") {
+            playPcm24k(msg.data);
+          }
+        } catch (e) {
+          console.error("onmessage error", e);
+        }
+      };
+
+      ws.onclose = () => {
+        document.getElementById('status-dot').style.backgroundColor = "#52525b";
+        document.getElementById('drawer-dot').style.backgroundColor = "#52525b";
+        
+        if (reconnectAttempts < 5) {
+          reconnectAttempts++;
+          const delay = Math.min(reconnectAttempts * 3000, 10000);
+          addLog("SYSTEM", `WebSocket disconnected. Retrying in ${delay / 1000}s...`);
+          reconnectTimer = setTimeout(initWebSocket, delay);
+        } else {
+          addLog("SYSTEM", "WebSocket paused. Click 'Reconnect' at the top to re-establish session.");
+        }
+      };
+
+      ws.onerror = (err) => {
+        addLog("ERROR", "WebSocket connection error occurred.");
+      };
+    }
+
+    function reconnectWebSocket() {
+      reconnectAttempts = 0;
+      if (reconnectTimer) {
+        clearTimeout(reconnectTimer);
+        reconnectTimer = null;
+      }
+      if (ws) {
+        try { ws.close(); } catch(e){}
+      }
+      addLog("SYSTEM", "Manually initiating WebSocket reconnect...");
+      initWebSocket();
+    }
+
+    // ----------------- Fallback Telemetry Polling -----------------
+    // Ensures CPU/RAM/Disk vitals NEVER freeze even if WebSocket is resetting
+    setInterval(async () => {
+      if (!ws || ws.readyState !== WebSocket.OPEN) {
+        try {
+          const res = await fetch('/api/telemetry');
+          if (res.ok) {
+            const json = await res.json();
+            updateTelemetry(json.vitals, json.processes ? json.processes.top_processes : []);
+          }
+        } catch (e) {}
+      }
+    }, 2500);
+
+    function updateTelemetry(data, procs) {
+      if (!data) return;
+      document.getElementById('os-label').innerText = data.hostname ? `${data.hostname} (${data.os})` : data.os;
+      document.getElementById('cpu-val').innerText = `${data.cpu_percent}%`;
+      document.getElementById('cpu-bar').style.width = `${data.cpu_percent}%`;
+      
+      document.getElementById('ram-val').innerText = `${data.ram_used_gb} / ${data.ram_total_gb} GB (${data.ram_percent}%)`;
+      document.getElementById('ram-bar').style.width = `${data.ram_percent}%`;
+
+      if (data.disk_percent !== undefined) {
+        document.getElementById('disk-val').innerText = `${data.disk_used_gb} / ${data.disk_total_gb} GB (${data.disk_percent}%)`;
+        document.getElementById('disk-bar').style.width = `${data.disk_percent}%`;
+      }
+
+      if (procs && procs.length > 0) {
+        const pList = document.getElementById('proc-list');
+        let html = '<div style="display: flex; justify-content: space-between; color: #71717a; font-size: 0.625rem;"><span>NAME</span><span>RAM %</span></div>';
+        procs.slice(0, 5).forEach(p => {
+          html += `<div style="display: flex; justify-content: space-between; color: #e4e4e7;"><span>${p.name.substring(0, 16)}</span><span style="color: #a1a1aa;">${p.ram}%</span></div>`;
+        });
+        pList.innerHTML = html;
+      }
+    }
+
+    // ----------------- Interactive Transmit & Shell -----------------
+    function handleInputKey(e) {
+      if (e.key === 'Enter') {
+        transmitInput();
+      }
+    }
+
+    function transmitInput() {
+      const text = hudCmdInput.value.trim();
+      if (!text) return;
+      hudCmdInput.value = '';
+
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: "chat", text: text }));
+      } else {
+        addLog("USER", text);
+        addLog("ERROR", "WebSocket not connected. Click 'Reconnect' at the top.");
+      }
+    }
+
+    function transmitShell() {
+      const cmd = hudCmdInput.value.trim();
+      if (!cmd) return;
+      hudCmdInput.value = '';
+      sendShellCommand(cmd);
+    }
+
+    function sendShellCommand(cmd) {
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: "run_shell", command: cmd }));
+      } else {
+        // REST fallback
+        fetch('/api/diagnostic', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ command: cmd })
+        })
+        .then(r => r.json())
+        .then(res => {
+          addLog("TOOL_EXEC", cmd);
+          addLog("TOOL_RET", JSON.stringify(res));
+        })
+        .catch(err => addLog("ERROR", err.message));
+      }
+    }
+
+    function sendDiagnosticCommand(tool) {
+      if (tool === 'get_system_telemetry') {
+        transmitPrompt("Report complete host system vitals.");
+      } else if (tool === 'get_process_list') {
+        transmitPrompt("List top resource-consuming processes.");
+      }
+    }
+
+    function transmitPrompt(text) {
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: "chat", text: text }));
+      }
+    }
+
+    function inspectOpticalFeed() {
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: "optical_inspect" }));
+      } else {
+        addLog("OPTICAL", "Please ensure camera is active and matrix is connected.");
+      }
+    }
+
+    // ----------------- Audio Pipeline -----------------
+    async function toggleAudio() {
+      if (mediaStream) {
+        // Disengage
+        if (speechRecognizer) {
+          try { speechRecognizer.stop(); } catch(e){}
+          speechRecognizer = null;
+        }
+        mediaStream.getTracks().forEach(t => t.stop());
+        mediaStream = null;
+        document.getElementById('mic-dot').style.backgroundColor = "#fbbf24";
+        document.getElementById('mic-btn-label').innerText = "Engage Voice";
+        document.getElementById('voice-state-badge').innerText = "AWAITING MIC";
+        document.getElementById('voice-state-badge').style.color = "#fbbf24";
+        document.getElementById('voice-state-badge').style.borderColor = "rgba(251, 191, 36, 0.3)";
+        document.getElementById('audio-hint').innerText = "Click to activate voice duplex";
+        animateBars(false);
+        addLog("AUDIO", "Microphone input disengaged.");
+        return;
+      }
+
+      addLog("AUDIO", "Requesting microphone permission...");
+
+      try {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          addLog("ERROR", "Microphone requires secure context (http://localhost:8000 or HTTPS).");
+          return;
+        }
+
+        mediaStream = await navigator.mediaDevices.getUserMedia({ 
+          audio: { 
+            channelCount: 1, 
+            sampleRate: 16000,
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true
+          } 
+        });
+
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') {
+          await audioCtx.resume();
+        }
+
+        const source = audioCtx.createMediaStreamSource(mediaStream);
+        const analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 64;
+        source.connect(analyser);
+
+        const dataArray = new Uint8Array(analyser.frequencyBinCount);
+        const micCheckInterval = setInterval(() => {
+          if (!mediaStream) {
+            clearInterval(micCheckInterval);
+            return;
+          }
+          analyser.getByteFrequencyData(dataArray);
+          let sum = 0;
+          for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
+          const avg = sum / dataArray.length;
+          animateBars(avg > 15);
+        }, 100);
+
+        // Web Speech Recognition for ultra-low latency speech transcription
+        const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (SpeechRec) {
+          speechRecognizer = new SpeechRec();
+          speechRecognizer.continuous = true;
+          speechRecognizer.interimResults = false;
+          speechRecognizer.lang = 'en-US';
+
+          speechRecognizer.onresult = (e) => {
+            const last = e.results.length - 1;
+            const text = e.results[last][0].transcript.trim();
+            if (text && ws && ws.readyState === WebSocket.OPEN) {
+              ws.send(JSON.stringify({ type: "speech_text", text: text }));
+            }
+          };
+
+          speechRecognizer.onerror = (e) => {
+            if (e.error !== 'no-speech') {
+              console.warn("Speech recognition error:", e.error);
+            }
+          };
+
+          speechRecognizer.onend = () => {
+            if (mediaStream && speechRecognizer) {
+              try { speechRecognizer.start(); } catch(e){}
+            }
+          };
+
+          speechRecognizer.start();
+        }
+
+        document.getElementById('mic-dot').style.backgroundColor = "#10b981";
+        document.getElementById('mic-btn-label').innerText = "Mic Active";
+        document.getElementById('voice-state-badge').innerText = "DUPLEX LIVE";
+        document.getElementById('voice-state-badge').style.color = "#34d399";
+        document.getElementById('voice-state-badge').style.borderColor = "rgba(16, 185, 129, 0.4)";
+        document.getElementById('audio-hint').innerText = "Ultron is listening (speak naturally)";
+        addLog("AUDIO", "Microphone active. Full voice duplex engaged.");
+
+      } catch (err) {
+        addLog("ERROR", `Failed to access microphone: ${err.message}`);
+      }
+    }
+
+    function playPcm24k(base64Data) {
+      if (!playbackCtx) {
+        playbackCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 24000 });
+        playbackAnalyser = playbackCtx.createAnalyser();
+        playbackAnalyser.fftSize = 64;
+        playbackAnalyser.connect(playbackCtx.destination);
+        startAudioReactiveAnimation();
+      }
+      if (playbackCtx.state === 'suspended') {
+        playbackCtx.resume();
+      }
+
+      const binary = atob(base64Data);
+      const bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+      const pcm16 = new Int16Array(bytes.buffer);
+      const float32 = new Float32Array(pcm16.length);
+      for (let i = 0; i < pcm16.length; i++) float32[i] = pcm16[i] / 32768.0;
+
+      const buffer = playbackCtx.createBuffer(1, float32.length, 24000);
+      buffer.getChannelData(0).set(float32);
+
+      const source = playbackCtx.createBufferSource();
+      source.buffer = buffer;
+      source.connect(playbackAnalyser);
+
+      const now = playbackCtx.currentTime;
+      if (nextPlayTime < now) nextPlayTime = now;
+      source.start(nextPlayTime);
+      nextPlayTime += buffer.duration;
+      activeSources.push(source);
+
+      source.onended = () => {
+        const index = activeSources.indexOf(source);
+        if (index > -1) activeSources.splice(index, 1);
+      };
+    }
+
+    // ----------------- Camera Handling -----------------
+    async function toggleCamera() {
+      const video = document.getElementById('video-preview');
+      const placeholder = document.getElementById('cam-placeholder');
+      const dot = document.getElementById('cam-dot');
+      const label = document.getElementById('cam-btn-label');
+      const badge = document.getElementById('cam-state-badge');
+      const canvas = document.getElementById('frame-canvas');
+      const ctx = canvas.getContext('2d');
+
+      if (videoStream) {
+        clearInterval(camInterval);
+        videoStream.getTracks().forEach(t => t.stop());
+        videoStream = null;
+        video.classList.add('hidden');
+        placeholder.classList.remove('hidden');
+        dot.style.backgroundColor = "#52525b";
+        label.innerText = "Optical: Off";
+        badge.innerText = "STANDBY";
+        badge.style.color = "#a1a1aa";
+        addLog("OPTICAL", "Camera optical feed disengaged.");
+        return;
+      }
+
+      try {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          addLog("ERROR", "Camera requires secure context (http://localhost:8000 or HTTPS).");
+          return;
+        }
+
+        videoStream = await navigator.mediaDevices.getUserMedia({ 
+          video: { width: 480, height: 360 } 
+        });
+        video.srcObject = videoStream;
+        video.classList.remove('hidden');
+        placeholder.classList.add('hidden');
+        dot.style.backgroundColor = "#10b981";
+        label.innerText = "Optical: Active";
+        badge.innerText = "STREAMING 1 FPS";
+        badge.style.color = "#34d399";
+        addLog("OPTICAL", "Camera online. Streaming frames @ 1 FPS to Ultron.");
+
+        camInterval = setInterval(() => {
+          if (!ws || ws.readyState !== WebSocket.OPEN) return;
+          ctx.drawImage(video, 0, 0, 480, 360);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.45);
+          const b64 = dataUrl.split(',')[1];
+          ws.send(JSON.stringify({ type: "video", data: b64 }));
+        }, 1200);
+      } catch (err) {
+        addLog("ERROR", `Failed to access camera: ${err.message}`);
+      }
+    }
+
+    // Auto-connect on page load
+    window.addEventListener('DOMContentLoaded', () => {
+      initWebSocket();
+      startAudioReactiveAnimation();
+    });
+  </script>
+</body>
+</html>
