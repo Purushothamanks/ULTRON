@@ -1161,15 +1161,15 @@
         return;
       }
 
-      addLog("AUDIO", "Requesting microphone permission...");
+      addLog("AUDIO", "Engaging microphone duplex...");
 
       try {
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-          addLog("ERROR", "Microphone requires secure context (http://localhost:8000).");
+          addLog("ERROR", "Microphone audio interface unavailable.");
           return;
         }
 
-        mediaStream = await navigator.mediaDevices.getUserMedia({ 
+        const getMediaPromise = navigator.mediaDevices.getUserMedia({ 
           audio: { 
             channelCount: 1, 
             sampleRate: 16000,
@@ -1177,7 +1177,17 @@
             noiseSuppression: true,
             autoGainControl: true
           } 
+        }).catch(() => {
+          // Fallback to basic audio constraints if advanced filters are unsupported
+          return navigator.mediaDevices.getUserMedia({ audio: true });
         });
+
+        // 4-second safety timeout so UI never hangs indefinitely
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error("Hardware microphone initialization timed out")), 4000)
+        );
+
+        mediaStream = await Promise.race([getMediaPromise, timeoutPromise]);
 
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         if (audioCtx.state === 'suspended') {
