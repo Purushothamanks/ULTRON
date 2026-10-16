@@ -492,12 +492,12 @@
           </div>
         </div>
 
-        <!-- Section 2: Voice Presence Card (Always-On Straight Duplex) -->
+        <!-- Section 2: Voice Presence Card -->
         <div class="voice-card">
           <div class="panel-header">
             <span class="panel-title">Voice Duplex</span>
-            <span id="voice-state-badge" class="badge-pill mono" style="font-size: 0.5625rem; color: #34d399; border-color: rgba(16, 185, 129, 0.4);">
-              ALWAYS-ON ACTIVE
+            <span id="voice-state-badge" class="badge-pill mono" style="font-size: 0.5625rem; color: #fbbf24; border-color: rgba(251, 191, 36, 0.3);">
+              STANDBY
             </span>
           </div>
 
@@ -511,15 +511,10 @@
             </div>
           </div>
 
-          <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.35rem 0.5rem; background: rgba(24, 24, 27, 0.7); border: 1px solid rgba(39, 39, 42, 0.8); border-radius: 4px;">
-            <div style="display: flex; align-items: center; gap: 6px;">
-              <span id="mic-dot" style="width: 7px; height: 7px; border-radius: 50%; background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span>
-              <span id="mic-btn-label" class="mono" style="font-size: 0.6875rem; color: #e4e4e7; font-weight: 500;">Hardware Mic Active</span>
-            </div>
-            <button id="mic-mute-btn" onclick="toggleMute()" class="btn btn-dark" style="padding: 0.2rem 0.5rem; font-size: 0.625rem;">
-              Mute
-            </button>
-          </div>
+          <button id="voice-btn" onclick="toggleVoiceDuplex()" class="btn btn-red" style="width: 100%; justify-content: center; font-size: 0.6875rem; padding: 0.4rem 0.5rem;">
+            <span id="mic-dot" style="width: 6px; height: 6px; border-radius: 50%; background-color: #ffffff;"></span>
+            <span id="mic-btn-label">Engage Voice</span>
+          </button>
         </div>
 
         <!-- Section 3: Hardware Telemetry Dashboard -->
@@ -1137,84 +1132,58 @@
       }
     }
 
-    // ----------------- Audio Pipeline -----------------
-    async function toggleAudio() {
+    // ----------------- Robust Direct Voice Duplex Pipeline -----------------
+    async function toggleVoiceDuplex() {
       ensureAudioUnlocked();
 
-    // ----------------- Always-On Continuous Voice Pipeline (Straight Permission) -----------------
-    let isMuted = false;
+      if (mediaStream) {
+        if (speechRecognizer) {
+          try { speechRecognizer.stop(); } catch(e){}
+          speechRecognizer = null;
+        }
+        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+          try { mediaRecorder.stop(); } catch(e){}
+          mediaRecorder = null;
+        }
+        if (vadInterval) {
+          clearInterval(vadInterval);
+          vadInterval = null;
+        }
+        mediaStream.getTracks().forEach(t => t.stop());
+        mediaStream = null;
 
-    function toggleMute() {
-      if (!mediaStream) {
-        startContinuousVoiceDuplex();
-        return;
-      }
-      isMuted = !isMuted;
-      mediaStream.getAudioTracks().forEach(t => t.enabled = !isMuted);
-      const muteBtn = document.getElementById('mic-mute-btn');
-      const micDot = document.getElementById('mic-dot');
-      const micLabel = document.getElementById('mic-btn-label');
-      const badge = document.getElementById('voice-state-badge');
-
-      if (isMuted) {
-        if (muteBtn) muteBtn.innerText = "Unmute";
+        const btn = document.getElementById('voice-btn');
+        if (btn) btn.className = "btn btn-red";
+        const micDot = document.getElementById('mic-dot');
         if (micDot) {
-          micDot.style.backgroundColor = "#ef4444";
+          micDot.style.backgroundColor = "#ffffff";
           micDot.style.boxShadow = "none";
         }
-        if (micLabel) micLabel.innerText = "Mic Muted";
+        const micLabel = document.getElementById('mic-btn-label');
+        if (micLabel) micLabel.innerText = "Engage Voice";
+        const badge = document.getElementById('voice-state-badge');
         if (badge) {
-          badge.innerText = "MUTED";
-          badge.style.color = "#f87171";
-          badge.style.borderColor = "rgba(239, 68, 68, 0.3)";
+          badge.innerText = "STANDBY";
+          badge.style.color = "#fbbf24";
+          badge.style.borderColor = "rgba(251, 191, 36, 0.3)";
         }
         animateBars(false);
-        addLog("AUDIO", "Microphone muted.");
-      } else {
-        if (muteBtn) muteBtn.innerText = "Mute";
-        if (micDot) {
-          micDot.style.backgroundColor = "#10b981";
-          micDot.style.boxShadow = "0 0 8px #10b981";
-        }
-        if (micLabel) micLabel.innerText = "Hardware Mic Active";
-        if (badge) {
-          badge.innerText = "ALWAYS-ON ACTIVE";
-          badge.style.color = "#34d399";
-          badge.style.borderColor = "rgba(16, 185, 129, 0.4)";
-        }
-        addLog("AUDIO", "Microphone unmuted. Voice duplex active.");
+        addLog("AUDIO", "Microphone disengaged.");
+        return;
       }
-    }
 
-    async function startContinuousVoiceDuplex() {
-      ensureAudioUnlocked();
-      if (mediaStream) return;
+      addLog("AUDIO", "Activating voice duplex...");
+      const micLabel = document.getElementById('mic-btn-label');
+      if (micLabel) micLabel.innerText = "Connecting...";
 
       try {
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-          addLog("ERROR", "Microphone audio interface unavailable.");
+          addLog("ERROR", "Microphone interface unavailable.");
           return;
         }
 
-        const getMediaPromise = navigator.mediaDevices.getUserMedia({ 
-          audio: { 
-            channelCount: 1, 
-            sampleRate: 16000,
-            echoCancellation: true,
-            noiseSuppression: true,
-            autoGainControl: true
-          } 
-        }).catch(() => {
-          // Direct fallback to basic hardware capture
-          return navigator.mediaDevices.getUserMedia({ audio: true });
-        });
-
-        // 4-second safety timeout so UI never hangs
-        const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error("Microphone response timed out")), 4000)
-        );
-
-        mediaStream = await Promise.race([getMediaPromise, timeoutPromise]);
+        // Direct hardware capture: resolves in ~300ms on PipeWire
+        mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         if (audioCtx.state === 'suspended') {
@@ -1232,7 +1201,6 @@
             clearInterval(micCheckInterval);
             return;
           }
-          if (isMuted) return;
           analyser.getByteFrequencyData(dataArray);
           let sum = 0;
           for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
@@ -1248,7 +1216,6 @@
           speechRecognizer.lang = 'en-US';
 
           speechRecognizer.onresult = (e) => {
-            if (isMuted) return;
             const last = e.results.length - 1;
             const text = e.results[last][0].transcript.trim();
             if (text && ws && ws.readyState === WebSocket.OPEN) {
@@ -1263,7 +1230,7 @@
           };
 
           speechRecognizer.onend = () => {
-            if (mediaStream && speechRecognizer && !isMuted) {
+            if (mediaStream && speechRecognizer) {
               try { speechRecognizer.start(); } catch(e){}
             }
           };
@@ -1283,7 +1250,7 @@
           };
 
           mediaRecorder.onstop = async () => {
-            if (!isMuted && recordedChunks.length > 0 && ws && ws.readyState === WebSocket.OPEN) {
+            if (recordedChunks.length > 0 && ws && ws.readyState === WebSocket.OPEN) {
               const audioBlob = new Blob(recordedChunks, { type: mimeType });
               recordedChunks = [];
               const reader = new FileReader();
@@ -1305,7 +1272,6 @@
               clearInterval(vadInterval);
               return;
             }
-            if (isMuted) return;
             analyser.getByteFrequencyData(dataArray);
             let sum = 0;
             for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
@@ -1335,20 +1301,27 @@
           }, 100);
         }
 
+        const btn = document.getElementById('voice-btn');
+        if (btn) btn.className = "btn btn-dark";
         const micDot = document.getElementById('mic-dot');
-        const micLabel = document.getElementById('mic-btn-label');
+        if (micDot) {
+          micDot.style.backgroundColor = "#10b981";
+          micDot.style.boxShadow = "0 0 8px #10b981";
+        }
+        if (micLabel) micLabel.innerText = "Mic Active (Listening)";
         const badge = document.getElementById('voice-state-badge');
-        if (micDot) micDot.style.backgroundColor = "#10b981";
-        if (micLabel) micLabel.innerText = "Hardware Mic Active";
         if (badge) {
-          badge.innerText = "ALWAYS-ON ACTIVE";
+          badge.innerText = "LISTENING";
           badge.style.color = "#34d399";
           badge.style.borderColor = "rgba(16, 185, 129, 0.4)";
         }
-        addLog("AUDIO", "Continuous hardware voice duplex engaged. Straight permission granted.");
+        addLog("AUDIO", "Microphone active. Voice duplex engaged.");
 
       } catch (err) {
-        addLog("AUDIO", `Microphone auto-link: ${err.message}`);
+        const btn = document.getElementById('voice-btn');
+        if (btn) btn.className = "btn btn-red";
+        if (micLabel) micLabel.innerText = "Engage Voice";
+        addLog("ERROR", `Microphone error: ${err.message}`);
       }
     }
 
@@ -1411,7 +1384,9 @@
     window.addEventListener('DOMContentLoaded', () => {
       initWebSocket();
       startAudioReactiveAnimation();
-      setTimeout(startContinuousVoiceDuplex, 300);
+      setTimeout(() => {
+        toggleVoiceDuplex().catch(() => {});
+      }, 500);
     });
   </script>
 </body>
