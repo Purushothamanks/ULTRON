@@ -724,11 +724,10 @@
       if (!playbackCtx) {
         playbackCtx = new (window.AudioContext || window.webkitAudioContext)();
         playbackAnalyser = playbackCtx.createAnalyser();
-        playbackAnalyser.fftSize = 64;
         playbackGain = playbackCtx.createGain();
         playbackGain.gain.value = 1.0;
-        playbackAnalyser.connect(playbackGain);
-        playbackGain.connect(playbackCtx.destination);
+        // Analyser calculates frequency data for 3D face reactivity.
+        // Destination is NOT connected by default to prevent dual audio echo with host PipeWire.
         startAudioReactiveAnimation();
       }
       if (playbackCtx.state === 'suspended') {
@@ -883,7 +882,7 @@
     }
 
     // ----------------- Robust Audio Player (Web Audio + Native HTML5) -----------------
-    function playAudioWav(base64Wav) {
+    function playAudioWav(base64Wav, hostPlayed = true) {
       ensureAudioUnlocked();
       try {
         const binary = atob(base64Wav);
@@ -891,15 +890,26 @@
         for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
 
         isSpeaking = true;
-        audioOutIndicator.innerText = "SPEAKER: SYNTHESIZING VOICE";
+        audioOutIndicator.innerText = "SPEAKER: ACTIVE";
         audioOutIndicator.style.color = "#38bdf8";
 
-        // Method 1: Web Audio Context decodeAudioData
+        // Web Audio Context: Decodes audio to drive the 3D Ultron Face vibration in real-time
         if (playbackCtx && playbackCtx.state === 'running') {
           playbackCtx.decodeAudioData(bytes.buffer.slice(0), (audioBuffer) => {
             const source = playbackCtx.createBufferSource();
             source.buffer = audioBuffer;
+            // Always connect to visual analyser so 3D face vibrates/pulses in sync
             source.connect(playbackAnalyser);
+
+            // ONLY connect to hardware destination if host backend did NOT already play to speakers
+            if (!hostPlayed) {
+              playbackAnalyser.connect(playbackGain);
+              playbackGain.connect(playbackCtx.destination);
+            } else {
+              // Ensure disconnected from physical destination to guarantee single voice with zero echo
+              try { playbackGain.disconnect(); } catch(e){}
+            }
+
             source.start(0);
 
             source.onended = () => {
@@ -908,10 +918,13 @@
               audioOutIndicator.style.color = "#a1a1aa";
             };
           }, (err) => {
-            // Method 2: HTML5 Audio fallback
-            playViaHtmlAudio(bytes);
+            if (!hostPlayed) {
+              playViaHtmlAudio(bytes);
+            } else {
+              isSpeaking = false;
+            }
           });
-        } else {
+        } else if (!hostPlayed) {
           playViaHtmlAudio(bytes);
         }
       } catch (e) {
@@ -969,7 +982,7 @@
           } else if (msg.type === "telemetry") {
             updateTelemetry(msg.data, msg.processes);
           } else if (msg.type === "audio") {
-            playAudioWav(msg.data);
+            playAudioWav(msg.data, msg.host_played !== false);
           }
         } catch (e) {
           console.error("onmessage error", e);

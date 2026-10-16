@@ -167,6 +167,9 @@ client = genai.Client(api_key=GEMINI_KEY) if GEMINI_KEY else None
 CHAT_MODEL = os.getenv("GEMINI_CHAT_MODEL", "gemini-3.5-flash")
 TTS_MODEL = "edge-tts-neural (en-US-ChristopherNeural)"
 
+current_speech_proc: Optional[subprocess.Popen] = None
+speech_lock = asyncio.Lock()
+
 def play_audio_to_speakers(audio_bytes: bytes):
     """Plays audio directly to physical hardware speakers using PipeWire / ALSA."""
     for player in (["pw-play", "-"], ["paplay"], ["aplay", "-q"]):
@@ -182,10 +185,21 @@ async def synthesize_ultron_voice(text: str) -> Optional[str]:
     """
     Synthesizes Ultron voice using high-fidelity neural Edge-TTS (ChristopherNeural, pitch -12Hz).
     Pipes audio chunks immediately to physical speakers via pw-play so speech begins on chunk 1.
+    Prevents overlapping voices by terminating any active speech process before starting a new one.
     """
+    global current_speech_proc
     clean_text = text.replace('*', '').replace('#', '').strip()
     if not clean_text:
         return None
+
+    # Terminate any previous speech playback immediately so 2 voices never overlap
+    if current_speech_proc and current_speech_proc.poll() is None:
+        try:
+            current_speech_proc.terminate()
+            current_speech_proc.wait(timeout=0.2)
+        except Exception:
+            pass
+        current_speech_proc = None
 
     # Method 1: Edge-TTS Neural Voice with immediate piped streaming to speakers
     try:
@@ -204,6 +218,7 @@ async def synthesize_ultron_voice(text: str) -> Optional[str]:
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL
             )
+            current_speech_proc = player_proc
         except Exception:
             player_proc = None
 
@@ -390,7 +405,7 @@ async def websocket_endpoint(ws: WebSocket):
                     # Voice synthesis
                     b64_audio = await synthesize_ultron_voice(observation)
                     if b64_audio:
-                        await send_json_safe(ws, {"type": "audio", "data": b64_audio})
+                        await send_json_safe(ws, {"type": "audio", "data": b64_audio, "host_played": True})
 
                 except Exception as ex:
                     await send_json_safe(ws, {"type": "log", "tag": "ERROR", "msg": f"Vision analysis error: {ex}"})
@@ -495,7 +510,7 @@ async def websocket_endpoint(ws: WebSocket):
                     # Synthesize & Pipe Voice directly to hardware speakers
                     b64_audio = await synthesize_ultron_voice(reply_text)
                     if b64_audio:
-                        await send_json_safe(ws, {"type": "audio", "data": b64_audio})
+                        await send_json_safe(ws, {"type": "audio", "data": b64_audio, "host_played": True})
                 else:
                     await send_json_safe(ws, {
                         "type": "log",
