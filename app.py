@@ -58,40 +58,54 @@ def main():
 
     print(f"Ultron Core running at {server_url}. Launching native desktop window...")
 
-    # 3. Create native standalone desktop window via pywebview with WebKitGTK media permissions
+    # 3. Create native standalone desktop window via pywebview with straight WebKitGTK permissions
     import webview
     
-    # Patch WebKitGTK backend to automatically grant microphone & camera permissions
+    # Straight permanent permissions for WebKitGTK
     try:
+        import gi
+        gi.require_version('Gtk', '3.0')
+        gi.require_version('WebKit2', '4.1')
+        from gi.repository import WebKit2
+
+        _orig_webview_init = WebKit2.WebView.__init__
+        def _patched_webview_init(self, *args, **kwargs):
+            _orig_webview_init(self, *args, **kwargs)
+            try:
+                s = self.get_settings()
+                s.set_enable_media_stream(True)
+                s.set_enable_mediasource(True)
+                s.set_enable_webaudio(True)
+                s.set_enable_webrtc(True)
+                s.set_media_playback_requires_user_gesture(False)
+            except Exception:
+                pass
+
+            def on_permission_request(web_view, request):
+                # Straight permanent permission grant for microphone & camera
+                try:
+                    request.allow()
+                    return True
+                except Exception:
+                    return False
+
+            self.connect("permission-request", on_permission_request)
+
+        WebKit2.WebView.__init__ = _patched_webview_init
+
         from webview.platforms import gtk as webview_gtk
         _orig_browser_view_init = webview_gtk.BrowserView.__init__
-
         def _patched_browser_view_init(self, window):
             _orig_browser_view_init(self, window)
             try:
-                settings = self.webview.get_settings()
-                settings.set_enable_media_stream(True)
-                settings.set_enable_mediasource(True)
-                settings.set_enable_webaudio(True)
-                settings.set_enable_webrtc(True)
-                settings.set_media_playback_requires_user_gesture(False)
-            except Exception as e:
-                print(f"[WebKit Settings Info]: {e}")
-
-            def on_permission_request(web_view, request):
-                try:
-                    # Automatically grant microphone, camera, and device access
-                    request.allow()
-                    return True
-                except Exception as e:
-                    print(f"[Permission Grant Error]: {e}")
-                    return False
-
-            self.webview.connect("permission-request", on_permission_request)
-
+                s = self.webview.get_settings()
+                s.set_enable_media_stream(True)
+                s.set_media_playback_requires_user_gesture(False)
+            except Exception:
+                pass
         webview_gtk.BrowserView.__init__ = _patched_browser_view_init
     except Exception as ex:
-        print(f"[WebKitGTK Permission Hook Info]: {ex}")
+        print(f"[Straight Permission Hook Info]: {ex}")
 
     # Configure pywebview window
     window = webview.create_window(

@@ -164,8 +164,23 @@ latest_camera_frame: Optional[bytes] = None
 GEMINI_KEY = os.getenv("GEMINI_API_KEY", "")
 client = genai.Client(api_key=GEMINI_KEY) if GEMINI_KEY else None
 
-CHAT_MODEL = os.getenv("GEMINI_CHAT_MODEL", "gemini-3.5-flash")
+CHAT_MODEL = os.getenv("GEMINI_CHAT_MODEL", "gemini-3.5-flash-lite")
 TTS_MODEL = "edge-tts-neural (en-US-ChristopherNeural)"
+
+def get_model_config() -> types.GenerateContentConfig:
+    """Returns optimal generation config based on model capabilities."""
+    if "lite" in CHAT_MODEL.lower():
+        return types.GenerateContentConfig(
+            system_instruction=ULTRON_PROMPT,
+            max_output_tokens=60,
+            temperature=0.3
+        )
+    return types.GenerateContentConfig(
+        system_instruction=ULTRON_PROMPT,
+        thinking_config=types.ThinkingConfig(thinking_budget=0),
+        max_output_tokens=60,
+        temperature=0.3
+    )
 
 current_speech_proc: Optional[subprocess.Popen] = None
 speech_lock = asyncio.Lock()
@@ -445,12 +460,7 @@ async def websocket_endpoint(ws: WebSocket):
                             vitals_ctx + "Listen to the user's spoken audio command. Respond directly as Ultron in 1 sentence."
                         ]
 
-                        cfg = types.GenerateContentConfig(
-                            system_instruction=ULTRON_PROMPT,
-                            thinking_config=types.ThinkingConfig(thinking_budget=0),
-                            max_output_tokens=60,
-                            temperature=0.3
-                        )
+                        cfg = get_model_config()
                         response = await client.aio.models.generate_content(
                             model=CHAT_MODEL,
                             contents=prompt_content,
@@ -529,12 +539,7 @@ async def websocket_endpoint(ws: WebSocket):
                                     vitals_ctx + user_text
                                 ]
 
-                            cfg = types.GenerateContentConfig(
-                                system_instruction=ULTRON_PROMPT,
-                                thinking_config=types.ThinkingConfig(thinking_budget=0),
-                                max_output_tokens=60,
-                                temperature=0.3
-                            )
+                            cfg = get_model_config()
                             response = await client.aio.models.generate_content(
                                 model=CHAT_MODEL,
                                 contents=prompt_content,
