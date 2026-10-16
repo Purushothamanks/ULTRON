@@ -36,9 +36,9 @@
       background-color: #050507;
     }
 
-    /* Top Navigation Header */
+    /* Top Navigation Header (Clean, Zero Redundant Action Buttons) */
     .top-header {
-      height: 52px;
+      height: 48px;
       flex-shrink: 0;
       border-bottom: 1px solid rgba(39, 39, 42, 0.85);
       background-color: rgba(9, 9, 11, 0.95);
@@ -88,7 +88,6 @@
       color: #a1a1aa;
     }
 
-    /* Header Controls */
     .header-actions {
       display: flex;
       align-items: center;
@@ -132,8 +131,8 @@
     .main-workspace {
       flex: 1;
       display: grid;
-      grid-template-columns: 360px 1fr;
-      height: calc(100vh - 52px);
+      grid-template-columns: 350px 1fr;
+      height: calc(100vh - 48px);
       overflow: hidden;
     }
     @media (max-width: 1024px) {
@@ -144,22 +143,22 @@
       }
     }
 
-    /* Left Sidebar: Telemetry & Controls */
+    /* Left Sidebar: Controls & Host Telemetry Deck */
     .left-sidebar {
       border-right: 1px solid rgba(39, 39, 42, 0.85);
-      background-color: rgba(9, 9, 11, 0.65);
-      padding: 1.15rem;
+      background-color: rgba(9, 9, 11, 0.75);
+      padding: 1rem;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       overflow-y: auto;
-      gap: 1rem;
+      gap: 0.85rem;
     }
     .panel-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.4rem;
     }
     .panel-title {
       font-size: 0.6875rem;
@@ -169,44 +168,21 @@
       letter-spacing: 0.08em;
     }
 
-    /* Equalizer Box */
-    .eq-box {
-      height: 74px;
+    /* Optical Sensor Card */
+    .sensor-card {
       border-radius: 8px;
       border: 1px solid #27272a;
       background-color: rgba(24, 24, 27, 0.4);
+      padding: 0.5rem;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      position: relative;
-      overflow: hidden;
+      gap: 0.5rem;
     }
-    .eq-box:hover {
-      border-color: #3f3f46;
-      background-color: rgba(39, 39, 42, 0.3);
-    }
-    .eq-bars {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      height: 28px;
-    }
-    .eq-bar {
-      width: 4px;
-      background-color: #52525b;
-      border-radius: 9999px;
-      transition: height 0.08s ease, background-color 0.1s ease;
-    }
-
-    /* Camera Feed Box */
     .camera-box {
-      height: 124px;
-      border-radius: 8px;
-      border: 1px solid #27272a;
-      background-color: rgba(24, 24, 27, 0.4);
+      height: 110px;
+      border-radius: 6px;
+      background-color: #0c0c0e;
+      border: 1px solid #1f1f23;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -218,6 +194,38 @@
       height: 100%;
       object-fit: cover;
     }
+    .sensor-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.4rem;
+    }
+
+    /* Voice Presence Card */
+    .voice-card {
+      border-radius: 8px;
+      border: 1px solid #27272a;
+      background-color: rgba(24, 24, 27, 0.4);
+      padding: 0.6rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .eq-box {
+      height: 48px;
+      border-radius: 6px;
+      border: 1px solid #1f1f23;
+      background-color: #0c0c0e;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .eq-bar {
+      width: 4px;
+      background-color: #52525b;
+      border-radius: 9999px;
+      transition: height 0.08s ease, background-color 0.1s ease;
+    }
 
     /* Progress Meters */
     .meter-row {
@@ -228,19 +236,19 @@
     }
     .meter-track {
       width: 100%;
-      height: 6px;
+      height: 5px;
       background-color: #18181b;
       border-radius: 9999px;
       overflow: hidden;
       border: 1px solid #27272a;
-      margin-bottom: 0.65rem;
+      margin-bottom: 0.55rem;
     }
     .meter-fill {
       height: 100%;
       transition: width 0.3s ease;
     }
 
-    /* Right Avatar Stage */
+    /* Right Avatar Stage (Clean, Zero Sub-Bars, Maximum Impact) */
     .avatar-stage-section {
       display: flex;
       flex-direction: column;
@@ -248,22 +256,9 @@
       overflow: hidden;
       position: relative;
     }
-    .stage-top-bar {
-      height: 36px;
-      flex-shrink: 0;
-      border-bottom: 1px solid rgba(39, 39, 42, 0.75);
-      background-color: rgba(9, 9, 11, 0.75);
-      backdrop-filter: blur(8px);
-      padding: 0 1.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      z-index: 20;
-    }
 
     .stage-viewport {
       flex: 1;
-      height: calc(100% - 36px);
       width: 100%;
       position: relative;
       display: flex;
@@ -275,8 +270,8 @@
 
     /* The Centerpiece: Ultron Face Fills That Space Fully (Pure Metallic, Zero Red Lights) */
     .ultron-tilt-wrap {
-      height: 86%;
-      max-height: 760px;
+      height: 88%;
+      max-height: 800px;
       aspect-ratio: 419 / 500;
       position: relative;
       display: flex;
@@ -300,27 +295,21 @@
       object-fit: contain;
       user-select: none;
       pointer-events: none;
-      filter: drop-shadow(0 25px 50px rgba(0, 0, 0, 0.88));
+      filter: drop-shadow(0 25px 50px rgba(0, 0, 0, 0.95));
       transition: filter 0.2s ease;
     }
 
     /* Multi-Harmonic Idle Floating Breathing */
     @keyframes ultronFloat {
-      0%, 100% {
-        transform: translateY(0px) rotate(0deg);
-      }
-      33% {
-        transform: translateY(-8px) rotate(0.35deg);
-      }
-      66% {
-        transform: translateY(5px) rotate(-0.3deg);
-      }
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      33% { transform: translateY(-8px) rotate(0.35deg); }
+      66% { transform: translateY(5px) rotate(-0.3deg); }
     }
     .float-idle {
       animation: ultronFloat 5.2s ease-in-out infinite;
     }
 
-    /* Concentric Rotary HUD Rings */
+    /* Rotary Concentric Neutral Rings */
     @keyframes spinClockwise {
       from { transform: rotate(0deg); }
       to { transform: rotate(360deg); }
@@ -329,17 +318,11 @@
       from { transform: rotate(360deg); }
       to { transform: rotate(0deg); }
     }
-    .hud-ring-1 {
-      animation: spinClockwise 34s linear infinite;
-    }
-    .hud-ring-2 {
-      animation: spinCounter 24s linear infinite;
-    }
-    .hud-ring-3 {
-      animation: spinClockwise 48s linear infinite;
-    }
+    .hud-ring-1 { animation: spinClockwise 34s linear infinite; }
+    .hud-ring-2 { animation: spinCounter 24s linear infinite; }
+    .hud-ring-3 { animation: spinClockwise 48s linear infinite; }
 
-    /* Soundwave Ripples (Neutral metallic) */
+    /* Neutral Soundwave Ripple */
     @keyframes waveRipple {
       0% { transform: scale(0.85); opacity: 0.6; }
       100% { transform: scale(1.45); opacity: 0; }
@@ -360,13 +343,13 @@
     .hud-dock-bar {
       padding: 0.5rem 0.85rem;
       border-radius: 8px;
-      background-color: rgba(12, 12, 16, 0.92);
-      backdrop-filter: blur(14px);
+      background-color: rgba(12, 12, 16, 0.94);
+      backdrop-filter: blur(16px);
       border: 1px solid rgba(63, 63, 70, 0.7);
       display: flex;
       flex-direction: column;
       gap: 0.45rem;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.75);
     }
     .hud-dock-top {
       display: flex;
@@ -380,7 +363,7 @@
     }
     .hud-input {
       flex: 1;
-      height: 32px;
+      height: 34px;
       border-radius: 6px;
       background-color: #18181b;
       border: 1px solid #27272a;
@@ -415,7 +398,7 @@
     }
     .hud-expanded-body {
       margin-top: 8px;
-      height: 250px;
+      height: 240px;
       border-radius: 8px;
       background-color: rgba(9, 9, 13, 0.96);
       backdrop-filter: blur(20px);
@@ -450,7 +433,7 @@
 
   <div class="app-root">
 
-    <!-- Top Navigation Header -->
+    <!-- Top Navigation Header (Clean & Minimalist) -->
     <header class="top-header">
       <div class="header-brand">
         <span id="status-dot" class="status-dot"></span>
@@ -458,26 +441,17 @@
           <span class="brand-title">ULTRON</span>
           <span class="brand-sub">COMMAND MATRIX</span>
         </div>
-        <span id="model-tag" class="badge-pill mono" style="margin-left: 0.75rem;">
+        <span id="model-tag" class="badge-pill mono" style="margin-left: 0.5rem;">
           gemini-3.5-flash // Fenrir
         </span>
       </div>
 
-      <!-- Quick Action Controls -->
+      <!-- Header Status & Reconnect -->
       <div class="header-actions">
-        <button id="mic-toggle-btn" onclick="toggleAudio()" class="btn btn-red">
-          <span id="mic-dot" style="width: 7px; height: 7px; border-radius: 50%; background-color: #fbbf24;"></span>
-          <span id="mic-btn-label">Engage Voice</span>
-        </button>
-
-        <button id="cam-toggle-btn" onclick="toggleCamera()" class="btn btn-dark">
-          <span id="cam-dot" style="width: 7px; height: 7px; border-radius: 50%; background-color: #52525b;"></span>
-          <span id="cam-btn-label">Optical: Off</span>
-        </button>
-
-        <div style="width: 1px; height: 16px; background-color: #27272a; margin: 0 4px;"></div>
-
-        <button id="reconnect-btn" onclick="reconnectWebSocket()" class="btn btn-dark">
+        <span id="speech-state-badge" class="badge-pill mono" style="color: #34d399; border-color: rgba(16, 185, 129, 0.3);">
+          CORE ACTIVE
+        </span>
+        <button id="reconnect-btn" onclick="reconnectWebSocket()" class="btn btn-dark" style="padding: 0.25rem 0.65rem; font-size: 0.6875rem;">
           Reconnect
         </button>
       </div>
@@ -486,66 +460,75 @@
     <!-- Main Workspace -->
     <main class="main-workspace">
       
-      <!-- Left Sidebar: Controls & Host Telemetry -->
+      <!-- Left Sidebar: Unified Controls & Host Telemetry Deck -->
       <section class="left-sidebar">
         
-        <!-- Voice Presence Equalizer -->
-        <div>
-          <div class="panel-header">
-            <span class="panel-title">Voice Presence</span>
-            <span id="voice-state-badge" class="badge-pill mono" style="color: #fbbf24; border-color: rgba(251, 191, 36, 0.3);">
-              AWAITING MIC
-            </span>
-          </div>
-
-          <div onclick="toggleAudio()" class="eq-box" title="Click to engage/disengage voice input">
-            <div id="bars" class="eq-bars">
-              <div class="eq-bar" style="height: 8px;"></div>
-              <div class="eq-bar" style="height: 16px;"></div>
-              <div class="eq-bar" style="height: 24px;"></div>
-              <div class="eq-bar" style="height: 16px;"></div>
-              <div class="eq-bar" style="height: 8px;"></div>
-            </div>
-            <span id="audio-hint" class="mono" style="font-size: 0.6875rem; color: #71717a; margin-top: 6px;">
-              Click to activate voice duplex
-            </span>
-          </div>
-        </div>
-
-        <!-- Optical Sensor (1 FPS) -->
-        <div>
+        <!-- Section 1: Optical Sensor Card -->
+        <div class="sensor-card">
           <div class="panel-header">
             <span class="panel-title">Optical Sensor</span>
-            <div style="display: flex; gap: 4px;">
-              <button onclick="inspectOpticalFeed()" class="hud-chip mono" style="padding: 0.1rem 0.4rem;">Inspect</button>
-              <span id="cam-state-badge" class="badge-pill mono">STANDBY</span>
-            </div>
+            <span id="cam-state-badge" class="badge-pill mono" style="font-size: 0.5625rem;">STANDBY</span>
           </div>
 
-          <div class="camera-box" onclick="toggleCamera()" style="cursor: pointer;" title="Click to toggle optical camera">
+          <div class="camera-box">
             <video id="video-preview" autoplay playsinline muted class="camera-video hidden"></video>
             <canvas id="frame-canvas" width="480" height="360" class="hidden"></canvas>
             <div id="cam-placeholder" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #52525b;">
-              <svg style="width: 22px; height: 22px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg style="width: 20px; height: 20px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
               </svg>
-              <span class="mono" style="font-size: 0.6875rem;">CLICK TO ENGAGE CAMERA</span>
+              <span class="mono" style="font-size: 0.625rem;">FEED INACTIVE</span>
             </div>
+          </div>
+
+          <div class="sensor-actions">
+            <button id="cam-toggle-btn" onclick="toggleCamera()" class="btn btn-dark" style="justify-content: center; font-size: 0.6875rem; padding: 0.3rem 0.5rem;">
+              <span id="cam-dot" style="width: 6px; height: 6px; border-radius: 50%; background-color: #52525b;"></span>
+              <span id="cam-btn-label">Camera</span>
+            </button>
+            <button onclick="inspectOpticalFeed()" class="btn btn-dark" style="justify-content: center; font-size: 0.6875rem; padding: 0.3rem 0.5rem;">
+              Inspect Visual
+            </button>
           </div>
         </div>
 
-        <!-- Hardware Telemetry Dashboard -->
-        <div style="border-top: 1px solid rgba(39, 39, 42, 0.85); padding-top: 0.85rem;">
+        <!-- Section 2: Voice Presence Card -->
+        <div class="voice-card">
+          <div class="panel-header">
+            <span class="panel-title">Voice Duplex</span>
+            <span id="voice-state-badge" class="badge-pill mono" style="font-size: 0.5625rem; color: #fbbf24; border-color: rgba(251, 191, 36, 0.3);">
+              STANDBY
+            </span>
+          </div>
+
+          <div class="eq-box">
+            <div id="bars" style="display: flex; align-items: center; gap: 5px; height: 24px;">
+              <div class="eq-bar" style="height: 6px;"></div>
+              <div class="eq-bar" style="height: 14px;"></div>
+              <div class="eq-bar" style="height: 20px;"></div>
+              <div class="eq-bar" style="height: 14px;"></div>
+              <div class="eq-bar" style="height: 6px;"></div>
+            </div>
+          </div>
+
+          <button id="mic-toggle-btn" onclick="toggleAudio()" class="btn btn-red" style="justify-content: center; font-size: 0.6875rem; padding: 0.35rem 0.5rem;">
+            <span id="mic-dot" style="width: 6px; height: 6px; border-radius: 50%; background-color: #ffffff;"></span>
+            <span id="mic-btn-label">Engage Voice</span>
+          </button>
+        </div>
+
+        <!-- Section 3: Hardware Telemetry Dashboard -->
+        <div style="border-top: 1px solid rgba(39, 39, 42, 0.7); padding-top: 0.75rem;">
           <div class="panel-header">
             <span class="panel-title">Host Telemetry</span>
-            <span id="os-label" class="mono" style="font-size: 0.6875rem; color: #a1a1aa;">Detecting...</span>
+            <span id="os-label" class="mono" style="font-size: 0.625rem; color: #a1a1aa;">Detecting...</span>
           </div>
           
-          <div style="margin-top: 0.5rem;">
+          <div style="margin-top: 0.4rem;">
             <div>
               <div class="meter-row mono">
-                <span style="color: #a1a1aa;">CPU LOAD</span>
-                <span id="cpu-val" style="color: #ffffff;">0%</span>
+                <span style="color: #a1a1aa; font-size: 0.6875rem;">CPU LOAD</span>
+                <span id="cpu-val" style="color: #ffffff; font-size: 0.6875rem;">0%</span>
               </div>
               <div class="meter-track">
                 <div id="cpu-bar" class="meter-fill" style="width: 0%; background-color: #ef4444;"></div>
@@ -554,8 +537,8 @@
 
             <div>
               <div class="meter-row mono">
-                <span style="color: #a1a1aa;">MEMORY</span>
-                <span id="ram-val" style="color: #ffffff;">0 / 0 GB (0%)</span>
+                <span style="color: #a1a1aa; font-size: 0.6875rem;">MEMORY</span>
+                <span id="ram-val" style="color: #ffffff; font-size: 0.6875rem;">0 / 0 GB (0%)</span>
               </div>
               <div class="meter-track">
                 <div id="ram-bar" class="meter-fill" style="width: 0%; background-color: #d4d4d8;"></div>
@@ -564,18 +547,18 @@
 
             <div>
               <div class="meter-row mono">
-                <span style="color: #a1a1aa;">ROOT DISK</span>
-                <span id="disk-val" style="color: #ffffff;">0 / 0 GB (0%)</span>
+                <span style="color: #a1a1aa; font-size: 0.6875rem;">ROOT DISK</span>
+                <span id="disk-val" style="color: #ffffff; font-size: 0.6875rem;">0 / 0 GB (0%)</span>
               </div>
               <div class="meter-track">
                 <div id="disk-bar" class="meter-fill" style="width: 0%; background-color: #a1a1aa;"></div>
               </div>
             </div>
 
-            <div style="margin-top: 0.5rem;">
-              <div class="mono" style="font-size: 0.625rem; color: #71717a; text-transform: uppercase; margin-bottom: 4px;">Top Processes</div>
-              <div id="proc-list" class="mono" style="font-size: 0.6875rem; display: flex; flex-direction: column; gap: 3px;">
-                <div style="display: flex; justify-content: space-between; color: #71717a; font-size: 0.625rem;">
+            <div style="margin-top: 0.4rem;">
+              <div class="mono" style="font-size: 0.5625rem; color: #71717a; text-transform: uppercase; margin-bottom: 3px;">Top Processes</div>
+              <div id="proc-list" class="mono" style="font-size: 0.625rem; display: flex; flex-direction: column; gap: 2px;">
+                <div style="display: flex; justify-content: space-between; color: #71717a;">
                   <span>NAME</span>
                   <span>RAM %</span>
                 </div>
@@ -586,43 +569,22 @@
 
       </section>
 
-      <!-- Right Column: The Real Ultron Face Filling That Space Fully & Animated -->
+      <!-- Right Column: Prime Ultron Face Canvas (No Redundant Top Sub-Bars) -->
       <section id="ultron-stage-section" class="avatar-stage-section">
         
-        <!-- Stage Top Bar -->
-        <div class="stage-top-bar">
-          <div style="display: flex; align-items: center; gap: 0.6rem;">
-            <span style="width: 8px; height: 8px; border-radius: 50%; background-color: #10b981; box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);"></span>
-            <span style="font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.12em; color: #d4d4d8;">AVATAR MATRIX // FULL STAGE</span>
-            <span id="speech-state-badge" class="badge-pill mono" style="margin-left: 0.5rem;">
-              CORE ACTIVE // STANDBY
-            </span>
-          </div>
-
-          <div style="display: flex; align-items: center; gap: 0.5rem;">
-            <button onclick="toggleLogDrawer()" id="hud-toggle-btn" class="btn btn-dark" style="padding: 0.25rem 0.6rem; font-size: 0.6875rem;">
-              <span id="hud-toggle-icon">▲</span>
-              <span id="hud-toggle-label">Logs HUD</span>
-            </button>
-            <button onclick="clearLogs()" class="btn btn-dark" style="padding: 0.25rem 0.6rem; font-size: 0.6875rem; color: #71717a;">
-              Clear
-            </button>
-          </div>
-        </div>
-
         <!-- Main Visual Stage Viewport -->
         <div id="stage-viewport" class="stage-viewport">
           
-          <!-- Subtle Neutral Ambient Vignette (No Red Light) -->
+          <!-- Subtle Neutral Ambient Vignette -->
           <div id="ambient-aura" style="position: absolute; width: 620px; height: 620px; border-radius: 50%; background-color: rgba(255, 255, 255, 0.03); filter: blur(140px); pointer-events: none; transition: all 0.3s ease;"></div>
 
           <!-- Rotary Concentric Neutral HUD Rings -->
-          <div class="hud-ring-1" style="position: absolute; width: 600px; height: 600px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.06); pointer-events: none;"></div>
-          <div class="hud-ring-2" style="position: absolute; width: 500px; height: 500px; border-radius: 50%; border: 1px dashed rgba(255, 255, 255, 0.05); pointer-events: none;"></div>
+          <div class="hud-ring-1" style="position: absolute; width: 620px; height: 620px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.06); pointer-events: none;"></div>
+          <div class="hud-ring-2" style="position: absolute; width: 510px; height: 510px; border-radius: 50%; border: 1px dashed rgba(255, 255, 255, 0.05); pointer-events: none;"></div>
           <div class="hud-ring-3" style="position: absolute; width: 420px; height: 420px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.08); pointer-events: none;"></div>
 
           <!-- Soundwave Shockwave Ring (Subtle Neutral) -->
-          <div id="shockwave-ring" style="position: absolute; width: 480px; height: 480px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.2); opacity: 0; pointer-events: none;"></div>
+          <div id="shockwave-ring" style="position: absolute; width: 490px; height: 490px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.2); opacity: 0; pointer-events: none;"></div>
 
           <!-- 3D Cursor Tracking Parallax Container -->
           <div id="ultron-tilt-container" class="ultron-tilt-wrap">
@@ -630,7 +592,7 @@
             <!-- Breathing Idle Avatar Container -->
             <div id="ultron-avatar-container" class="ultron-avatar-box float-idle">
               
-              <!-- Pure Real Ultron Face Mask (Clean Metallic, No Red Lights) -->
+              <!-- Pure Real Ultron Face Mask (Clean Metallic, Zero Red Lights) -->
               <img 
                 id="ultron-face-img" 
                 src="static/ultron_face.png" 
@@ -642,15 +604,15 @@
 
           </div>
 
-          <!-- Futuristic HUD Telemetry Corner Brackets -->
+          <!-- Corner Telemetry Brackets -->
           <div style="position: absolute; top: 1rem; left: 1.5rem; font-size: 0.625rem; color: #71717a; pointer-events: none; display: flex; flex-direction: column; gap: 3px;" class="mono">
             <div style="color: #a1a1aa; font-weight: 700; letter-spacing: 0.05em;">ULTRON // PRIME ARTIFICIAL SENTIENCE</div>
-            <div>SYNTHESIS: FENRIR 24KHZ PCM // ADAPTIVE REASONING</div>
+            <div>SYNTHESIS: FENRIR 24KHZ PCM // DUPLEX SPEECH</div>
           </div>
 
           <div style="position: absolute; top: 1rem; right: 1.5rem; font-size: 0.625rem; color: #71717a; pointer-events: none; text-align: right; display: flex; flex-direction: column; gap: 3px;" class="mono">
-            <div>PARALLAX: 3D HEAD TRACKING [ACTIVE]</div>
-            <div style="color: #a1a1aa; font-weight: 600;">STATUS: FULL OPERATIONAL</div>
+            <div>3D PARALLAX: HEAD TRACKING [ACTIVE]</div>
+            <div id="audio-out-indicator" style="color: #a1a1aa; font-weight: 600;">SPEAKER: STANDBY</div>
           </div>
 
           <!-- Bottom Floating HUD Console Drawer -->
@@ -662,7 +624,7 @@
                 <div style="display: flex; align-items: center; gap: 0.75rem; overflow: hidden; flex: 1; margin-right: 1rem;">
                   <span id="drawer-dot" style="width: 7px; height: 7px; border-radius: 50%; background-color: #10b981; flex-shrink: 0;"></span>
                   <span class="mono" style="font-size: 0.6875rem; color: #71717a; flex-shrink: 0; text-transform: uppercase;">LATEST:</span>
-                  <span id="hud-ticker-text" class="mono" style="font-size: 0.75rem; color: #e4e4e7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Ultron command matrix online and ready.</span>
+                  <span id="hud-ticker-text" class="mono" style="font-size: 0.75rem; color: #e4e4e7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Ultron command matrix online and active.</span>
                 </div>
 
                 <div style="display: flex; align-items: center; gap: 0.4rem; flex-shrink: 0;">
@@ -671,7 +633,7 @@
                   <button onclick="sendShellCommand('df -h /')" class="hud-chip mono">Disk</button>
                   <button onclick="sendShellCommand('free -m')" class="hud-chip mono">RAM</button>
                   <button onclick="toggleLogDrawer()" id="drawer-toggle-btn" class="btn btn-dark" style="padding: 0.25rem 0.6rem; font-size: 0.6875rem; font-family: monospace;">
-                    Expand Logs
+                    Logs HUD ▲
                   </button>
                 </div>
               </div>
@@ -682,13 +644,13 @@
                   type="text" 
                   id="hud-cmd-input" 
                   class="hud-input" 
-                  placeholder="Ask Ultron a question or enter a terminal command..." 
+                  placeholder="Ask Ultron a question or execute a host terminal diagnostic..." 
                   onkeydown="handleInputKey(event)"
                 />
-                <button onclick="transmitInput()" class="btn btn-red" style="padding: 0.35rem 0.8rem; height: 32px;">
+                <button onclick="transmitInput()" class="btn btn-red" style="padding: 0.35rem 0.85rem; height: 34px;">
                   Transmit
                 </button>
-                <button onclick="transmitShell()" class="btn btn-dark" style="padding: 0.35rem 0.8rem; height: 32px;" title="Execute directly in bash">
+                <button onclick="transmitShell()" class="btn btn-dark" style="padding: 0.35rem 0.85rem; height: 34px;" title="Execute directly in bash">
                   Shell
                 </button>
               </div>
@@ -711,7 +673,7 @@
               <div id="log-container" class="log-stream mono">
                 <div class="log-row" style="color: #52525b;">
                   <span style="width: 6px; height: 6px; border-radius: 50%; background-color: #10b981; margin-top: 5px;"></span>
-                  <span>System matrix active. Monitoring host vitals.</span>
+                  <span>Ultron core session initialized.</span>
                 </div>
               </div>
             </div>
@@ -732,48 +694,60 @@
     let mediaStream = null;
     let videoStream = null;
     let camInterval = null;
-    let nextPlayTime = 0;
-    let activeSources = [];
     let currentFilter = 'all';
     let speechRecognizer = null;
 
-    // Audio Analysis for Real-time Speech Articulation
+    // Dedicated Playback Context for Crystal-Clear Ultron Voice
     let playbackCtx = null;
     let playbackAnalyser = null;
+    let playbackGain = null;
     let animFrameId = null;
 
     // Elements
     const logBox = document.getElementById('log-container');
     const bars = document.getElementById('bars').children;
     const ultronTiltContainer = document.getElementById('ultron-tilt-container');
-    const ultronAvatarContainer = document.getElementById('ultron-avatar-container');
     const ultronFaceImg = document.getElementById('ultron-face-img');
     const ambientAura = document.getElementById('ambient-aura');
     const shockwaveRing = document.getElementById('shockwave-ring');
     const speechStateBadge = document.getElementById('speech-state-badge');
+    const audioOutIndicator = document.getElementById('audio-out-indicator');
     const hudTickerText = document.getElementById('hud-ticker-text');
     const hudExpandedBody = document.getElementById('hud-expanded-body');
     const drawerToggleBtn = document.getElementById('drawer-toggle-btn');
-    const hudToggleLabel = document.getElementById('hud-toggle-label');
-    const hudToggleIcon = document.getElementById('hud-toggle-icon');
     const hudCmdInput = document.getElementById('hud-cmd-input');
 
     let isLogsExpanded = false;
+
+    // ----------------- Audio Unlock on User Interaction -----------------
+    function ensureAudioUnlocked() {
+      if (!playbackCtx) {
+        playbackCtx = new (window.AudioContext || window.webkitAudioContext)();
+        playbackAnalyser = playbackCtx.createAnalyser();
+        playbackAnalyser.fftSize = 64;
+        playbackGain = playbackCtx.createGain();
+        playbackGain.gain.value = 1.0;
+        playbackAnalyser.connect(playbackGain);
+        playbackGain.connect(playbackCtx.destination);
+        startAudioReactiveAnimation();
+      }
+      if (playbackCtx.state === 'suspended') {
+        playbackCtx.resume().catch(() => {});
+      }
+    }
+    window.addEventListener('click', ensureAudioUnlocked, { once: false });
+    window.addEventListener('keydown', ensureAudioUnlocked, { once: false });
 
     // ----------------- Collapsible HUD Drawer -----------------
     function toggleLogDrawer() {
       isLogsExpanded = !isLogsExpanded;
       if (isLogsExpanded) {
         hudExpandedBody.classList.remove('hidden');
-        drawerToggleBtn.innerText = "Minimize Logs";
-        hudToggleLabel.innerText = "Hide Logs";
-        hudToggleIcon.innerText = "▼";
+        drawerToggleBtn.innerText = "Logs HUD ▼";
         logBox.scrollTop = logBox.scrollHeight;
       } else {
         hudExpandedBody.classList.add('hidden');
-        drawerToggleBtn.innerText = "Expand Logs";
-        hudToggleLabel.innerText = "Logs HUD";
-        hudToggleIcon.innerText = "▲";
+        drawerToggleBtn.innerText = "Logs HUD ▲";
       }
     }
 
@@ -789,10 +763,8 @@
       const rect = stage.getBoundingClientRect();
       const x = (e.clientX - (rect.left + rect.width / 2)) / (rect.width / 2);
       const y = (e.clientY - (rect.top + rect.height / 2)) / (rect.height / 2);
-      const cx = Math.max(-1, Math.min(1, x));
-      const cy = Math.max(-1, Math.min(1, y));
-      targetTiltY = cx * 14;  // Rotate around Y axis (look left/right)
-      targetTiltX = -cy * 10; // Rotate around X axis (look up/down)
+      targetTiltY = Math.max(-1, Math.min(1, x)) * 14;
+      targetTiltX = -Math.max(-1, Math.min(1, y)) * 10;
     });
 
     window.addEventListener('mouseleave', () => {
@@ -833,8 +805,6 @@
 
     function addLog(tag, msg) {
       const time = new Date().toLocaleTimeString('en-US', { hour12: false });
-      
-      // Update HUD bottom ticker
       hudTickerText.innerText = `[${tag}] ${msg}`;
 
       const row = document.createElement('div');
@@ -867,75 +837,108 @@
     function animateBars(active) {
       for (let bar of bars) {
         if (active) {
-          const h = Math.floor(Math.random() * 20) + 6;
+          const h = Math.floor(Math.random() * 18) + 6;
           bar.style.height = `${h}px`;
           bar.style.backgroundColor = '#10b981';
         } else {
-          bar.style.height = "8px";
+          bar.style.height = "6px";
           bar.style.backgroundColor = '#52525b';
         }
       }
     }
 
-    // ----------------- Real-Time Ultron Facial Animation Loop (No Red Light) -----------------
+    // ----------------- Facial & Acoustic Vibration Loop -----------------
+    let isSpeaking = false;
+
     function startAudioReactiveAnimation() {
       if (animFrameId) return;
-
       const freqData = new Uint8Array(32);
 
       function renderFrame() {
-        // Smooth 3D tilt lerp
         currentTiltX += (targetTiltX - currentTiltX) * 0.08;
         currentTiltY += (targetTiltY - currentTiltY) * 0.08;
 
-        if (playbackAnalyser && activeSources.length > 0) {
+        if (playbackAnalyser && isSpeaking) {
           playbackAnalyser.getByteFrequencyData(freqData);
           let sum = 0;
           for (let i = 0; i < freqData.length; i++) sum += freqData[i];
           const avg = sum / freqData.length;
-          const intensity = Math.min(1, avg / 110);
+          const intensity = Math.min(1, avg / 100);
 
-          // Combined 3D Tilt + Speech Resonance Pulse
           const speechScale = 1.0 + (intensity * 0.035);
           ultronTiltContainer.style.transform = `perspective(1200px) rotateX(${currentTiltX.toFixed(2)}deg) rotateY(${currentTiltY.toFixed(2)}deg) scale(${speechScale.toFixed(3)})`;
-          
-          // Pure metallic depth shadow (No red light)
-          ultronFaceImg.style.filter = 'drop-shadow(0 25px 50px rgba(0, 0, 0, 0.95))';
+          ultronFaceImg.style.filter = 'drop-shadow(0 25px 50px rgba(0, 0, 0, 0.98))';
 
-          // Subtle acoustic shockwave
-          shockwaveRing.style.opacity = `${0.2 + intensity * 0.5}`;
+          shockwaveRing.style.opacity = `${0.2 + intensity * 0.6}`;
           shockwaveRing.classList.add('shockwave-active');
-
-          speechStateBadge.innerText = "SYNTHESIZING VOICE // SPEAKING";
-          speechStateBadge.style.color = "#38bdf8";
-          speechStateBadge.style.borderColor = "rgba(56, 189, 248, 0.4)";
-          speechStateBadge.style.backgroundColor = "rgba(12, 74, 110, 0.4)";
         } else {
-          // Idle Animation State
           ultronTiltContainer.style.transform = `perspective(1200px) rotateX(${currentTiltX.toFixed(2)}deg) rotateY(${currentTiltY.toFixed(2)}deg)`;
           ultronFaceImg.style.filter = 'drop-shadow(0 20px 40px rgba(0, 0, 0, 0.85))';
-          ambientAura.style.backgroundColor = 'rgba(255, 255, 255, 0.03)';
-
           shockwaveRing.style.opacity = '0';
           shockwaveRing.classList.remove('shockwave-active');
-
-          if (mediaStream) {
-            speechStateBadge.innerText = "LISTENING // DUPLEX ACTIVE";
-            speechStateBadge.style.color = "#34d399";
-            speechStateBadge.style.borderColor = "rgba(16, 185, 129, 0.3)";
-            speechStateBadge.style.backgroundColor = "rgba(6, 78, 59, 0.4)";
-          } else {
-            speechStateBadge.innerText = "CORE ACTIVE // STANDBY";
-            speechStateBadge.style.color = "#a1a1aa";
-            speechStateBadge.style.borderColor = "#27272a";
-            speechStateBadge.style.backgroundColor = "rgba(24, 24, 27, 0.6)";
-          }
         }
         animFrameId = requestAnimationFrame(renderFrame);
       }
       renderFrame();
     }
 
+    // ----------------- Robust Audio Player (Web Audio + Native HTML5) -----------------
+    function playAudioWav(base64Wav) {
+      ensureAudioUnlocked();
+      try {
+        const binary = atob(base64Wav);
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+
+        isSpeaking = true;
+        audioOutIndicator.innerText = "SPEAKER: SYNTHESIZING VOICE";
+        audioOutIndicator.style.color = "#38bdf8";
+
+        // Method 1: Web Audio Context decodeAudioData
+        if (playbackCtx && playbackCtx.state === 'running') {
+          playbackCtx.decodeAudioData(bytes.buffer.slice(0), (audioBuffer) => {
+            const source = playbackCtx.createBufferSource();
+            source.buffer = audioBuffer;
+            source.connect(playbackAnalyser);
+            source.start(0);
+
+            source.onended = () => {
+              isSpeaking = false;
+              audioOutIndicator.innerText = "SPEAKER: STANDBY";
+              audioOutIndicator.style.color = "#a1a1aa";
+            };
+          }, (err) => {
+            // Method 2: HTML5 Audio fallback
+            playViaHtmlAudio(bytes);
+          });
+        } else {
+          playViaHtmlAudio(bytes);
+        }
+      } catch (e) {
+        console.error("Audio playback error:", e);
+        isSpeaking = false;
+      }
+    }
+
+    function playViaHtmlAudio(uint8Array) {
+      try {
+        const blob = new Blob([uint8Array], { type: 'audio/wav' });
+        const url = URL.createObjectURL(blob);
+        const audio = new Audio(url);
+        audio.play().catch(e => console.warn("HTML5 audio play blocked:", e));
+        audio.onended = () => {
+          isSpeaking = false;
+          audioOutIndicator.innerText = "SPEAKER: STANDBY";
+          audioOutIndicator.style.color = "#a1a1aa";
+          URL.revokeObjectURL(url);
+        };
+      } catch (err) {
+        console.error("HTML5 audio error:", err);
+        isSpeaking = false;
+      }
+    }
+
+    // ----------------- WebSocket Connection -----------------
     let reconnectAttempts = 0;
     let reconnectTimer = null;
 
@@ -966,7 +969,7 @@
           } else if (msg.type === "telemetry") {
             updateTelemetry(msg.data, msg.processes);
           } else if (msg.type === "audio") {
-            playPcm24k(msg.data);
+            playAudioWav(msg.data);
           }
         } catch (e) {
           console.error("onmessage error", e);
@@ -987,7 +990,7 @@
         }
       };
 
-      ws.onerror = (err) => {
+      ws.onerror = () => {
         addLog("ERROR", "WebSocket connection error occurred.");
       };
     }
@@ -1006,7 +1009,6 @@
     }
 
     // ----------------- Fallback Telemetry Polling -----------------
-    // Ensures CPU/RAM/Disk vitals NEVER freeze even if WebSocket is resetting
     setInterval(async () => {
       if (!ws || ws.readyState !== WebSocket.OPEN) {
         try {
@@ -1035,7 +1037,7 @@
 
       if (procs && procs.length > 0) {
         const pList = document.getElementById('proc-list');
-        let html = '<div style="display: flex; justify-content: space-between; color: #71717a; font-size: 0.625rem;"><span>NAME</span><span>RAM %</span></div>';
+        let html = '<div style="display: flex; justify-content: space-between; color: #71717a;"><span>NAME</span><span>RAM %</span></div>';
         procs.slice(0, 5).forEach(p => {
           html += `<div style="display: flex; justify-content: space-between; color: #e4e4e7;"><span>${p.name.substring(0, 16)}</span><span style="color: #a1a1aa;">${p.ram}%</span></div>`;
         });
@@ -1051,6 +1053,7 @@
     }
 
     function transmitInput() {
+      ensureAudioUnlocked();
       const text = hudCmdInput.value.trim();
       if (!text) return;
       hudCmdInput.value = '';
@@ -1064,6 +1067,7 @@
     }
 
     function transmitShell() {
+      ensureAudioUnlocked();
       const cmd = hudCmdInput.value.trim();
       if (!cmd) return;
       hudCmdInput.value = '';
@@ -1071,10 +1075,10 @@
     }
 
     function sendShellCommand(cmd) {
+      ensureAudioUnlocked();
       if (ws && ws.readyState === WebSocket.OPEN) {
         ws.send(JSON.stringify({ type: "run_shell", command: cmd }));
       } else {
-        // REST fallback
         fetch('/api/diagnostic', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -1090,6 +1094,7 @@
     }
 
     function sendDiagnosticCommand(tool) {
+      ensureAudioUnlocked();
       if (tool === 'get_system_telemetry') {
         transmitPrompt("Report complete host system vitals.");
       } else if (tool === 'get_process_list') {
@@ -1098,12 +1103,14 @@
     }
 
     function transmitPrompt(text) {
+      ensureAudioUnlocked();
       if (ws && ws.readyState === WebSocket.OPEN) {
         ws.send(JSON.stringify({ type: "chat", text: text }));
       }
     }
 
     function inspectOpticalFeed() {
+      ensureAudioUnlocked();
       if (ws && ws.readyState === WebSocket.OPEN) {
         ws.send(JSON.stringify({ type: "optical_inspect" }));
       } else {
@@ -1113,22 +1120,22 @@
 
     // ----------------- Audio Pipeline -----------------
     async function toggleAudio() {
+      ensureAudioUnlocked();
+
       if (mediaStream) {
-        // Disengage
         if (speechRecognizer) {
           try { speechRecognizer.stop(); } catch(e){}
           speechRecognizer = null;
         }
         mediaStream.getTracks().forEach(t => t.stop());
         mediaStream = null;
-        document.getElementById('mic-dot').style.backgroundColor = "#fbbf24";
+        document.getElementById('mic-dot').style.backgroundColor = "#ffffff";
         document.getElementById('mic-btn-label').innerText = "Engage Voice";
-        document.getElementById('voice-state-badge').innerText = "AWAITING MIC";
+        document.getElementById('voice-state-badge').innerText = "STANDBY";
         document.getElementById('voice-state-badge').style.color = "#fbbf24";
         document.getElementById('voice-state-badge').style.borderColor = "rgba(251, 191, 36, 0.3)";
-        document.getElementById('audio-hint').innerText = "Click to activate voice duplex";
         animateBars(false);
-        addLog("AUDIO", "Microphone input disengaged.");
+        addLog("AUDIO", "Microphone disengaged.");
         return;
       }
 
@@ -1136,7 +1143,7 @@
 
       try {
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-          addLog("ERROR", "Microphone requires secure context (http://localhost:8000 or HTTPS).");
+          addLog("ERROR", "Microphone requires secure context (http://localhost:8000).");
           return;
         }
 
@@ -1173,7 +1180,6 @@
           animateBars(avg > 15);
         }, 100);
 
-        // Web Speech Recognition for ultra-low latency speech transcription
         const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (SpeechRec) {
           speechRecognizer = new SpeechRec();
@@ -1206,57 +1212,19 @@
 
         document.getElementById('mic-dot').style.backgroundColor = "#10b981";
         document.getElementById('mic-btn-label').innerText = "Mic Active";
-        document.getElementById('voice-state-badge').innerText = "DUPLEX LIVE";
+        document.getElementById('voice-state-badge').innerText = "LISTENING";
         document.getElementById('voice-state-badge').style.color = "#34d399";
         document.getElementById('voice-state-badge').style.borderColor = "rgba(16, 185, 129, 0.4)";
-        document.getElementById('audio-hint').innerText = "Ultron is listening (speak naturally)";
-        addLog("AUDIO", "Microphone active. Full voice duplex engaged.");
+        addLog("AUDIO", "Microphone active. Voice duplex engaged.");
 
       } catch (err) {
         addLog("ERROR", `Failed to access microphone: ${err.message}`);
       }
     }
 
-    function playPcm24k(base64Data) {
-      if (!playbackCtx) {
-        playbackCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 24000 });
-        playbackAnalyser = playbackCtx.createAnalyser();
-        playbackAnalyser.fftSize = 64;
-        playbackAnalyser.connect(playbackCtx.destination);
-        startAudioReactiveAnimation();
-      }
-      if (playbackCtx.state === 'suspended') {
-        playbackCtx.resume();
-      }
-
-      const binary = atob(base64Data);
-      const bytes = new Uint8Array(binary.length);
-      for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-      const pcm16 = new Int16Array(bytes.buffer);
-      const float32 = new Float32Array(pcm16.length);
-      for (let i = 0; i < pcm16.length; i++) float32[i] = pcm16[i] / 32768.0;
-
-      const buffer = playbackCtx.createBuffer(1, float32.length, 24000);
-      buffer.getChannelData(0).set(float32);
-
-      const source = playbackCtx.createBufferSource();
-      source.buffer = buffer;
-      source.connect(playbackAnalyser);
-
-      const now = playbackCtx.currentTime;
-      if (nextPlayTime < now) nextPlayTime = now;
-      source.start(nextPlayTime);
-      nextPlayTime += buffer.duration;
-      activeSources.push(source);
-
-      source.onended = () => {
-        const index = activeSources.indexOf(source);
-        if (index > -1) activeSources.splice(index, 1);
-      };
-    }
-
     // ----------------- Camera Handling -----------------
     async function toggleCamera() {
+      ensureAudioUnlocked();
       const video = document.getElementById('video-preview');
       const placeholder = document.getElementById('cam-placeholder');
       const dot = document.getElementById('cam-dot');
@@ -1272,16 +1240,16 @@
         video.classList.add('hidden');
         placeholder.classList.remove('hidden');
         dot.style.backgroundColor = "#52525b";
-        label.innerText = "Optical: Off";
+        label.innerText = "Camera";
         badge.innerText = "STANDBY";
         badge.style.color = "#a1a1aa";
-        addLog("OPTICAL", "Camera optical feed disengaged.");
+        addLog("OPTICAL", "Camera feed stopped.");
         return;
       }
 
       try {
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-          addLog("ERROR", "Camera requires secure context (http://localhost:8000 or HTTPS).");
+          addLog("ERROR", "Camera requires secure context (http://localhost:8000).");
           return;
         }
 
@@ -1292,8 +1260,8 @@
         video.classList.remove('hidden');
         placeholder.classList.add('hidden');
         dot.style.backgroundColor = "#10b981";
-        label.innerText = "Optical: Active";
-        badge.innerText = "STREAMING 1 FPS";
+        label.innerText = "Cam Active";
+        badge.innerText = "LIVE 1 FPS";
         badge.style.color = "#34d399";
         addLog("OPTICAL", "Camera online. Streaming frames @ 1 FPS to Ultron.");
 

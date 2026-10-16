@@ -1,10 +1,12 @@
 import asyncio
 import base64
+import io
 import json
 import os
 import platform
 import subprocess
 import time
+import wave
 from pathlib import Path
 from typing import Optional
 
@@ -135,8 +137,18 @@ client = genai.Client(api_key=GEMINI_KEY) if GEMINI_KEY else None
 CHAT_MODEL = os.getenv("GEMINI_CHAT_MODEL", "gemini-3.5-flash")
 TTS_MODEL = os.getenv("GEMINI_TTS_MODEL", "gemini-2.5-flash-preview-tts")
 
+def pcm_to_wav(pcm_data: bytes, sample_rate: int = 24000, channels: int = 1, sample_width: int = 2) -> bytes:
+    """Wraps raw linear PCM bytes in a standard 44-byte RIFF WAV header."""
+    buf = io.BytesIO()
+    with wave.open(buf, "wb") as wf:
+        wf.setnchannels(channels)
+        wf.setsampwidth(sample_width)
+        wf.setframerate(sample_rate)
+        wf.writeframes(pcm_data)
+    return buf.getvalue()
+
 async def synthesize_ultron_voice(text: str) -> Optional[str]:
-    """Synthesizes text into 24kHz raw PCM audio using Ultron's Fenrir voice."""
+    """Synthesizes text into 24kHz standard WAV audio using Ultron's Fenrir voice."""
     if not client:
         return None
     try:
@@ -156,7 +168,9 @@ async def synthesize_ultron_voice(text: str) -> Optional[str]:
         if tts_res.candidates and tts_res.candidates[0].content.parts:
             part = tts_res.candidates[0].content.parts[0]
             if part.inline_data:
-                return base64.b64encode(part.inline_data.data).decode("utf-8")
+                # Wrap raw PCM into standard WAV so every browser can decode and play it flawlessly
+                wav_bytes = pcm_to_wav(part.inline_data.data, sample_rate=24000)
+                return base64.b64encode(wav_bytes).decode("utf-8")
     except Exception as e:
         print(f"[TTS Error]: {e}")
     return None
