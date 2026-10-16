@@ -773,6 +773,8 @@
     });
 
     // ----------------- Filter System -----------------
+    let currentFilter = 'all';
+
     function setFilter(type) {
       currentFilter = type;
       ['all', 'dialogue', 'tools'].forEach(f => {
@@ -827,7 +829,11 @@
       `;
       logBox.appendChild(row);
       logBox.scrollTop = logBox.scrollHeight;
-      applyFilter();
+      try {
+        applyFilter();
+      } catch (err) {
+        console.warn("applyFilter notice:", err);
+      }
     }
 
     function clearLogs() { 

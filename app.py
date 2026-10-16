@@ -58,68 +58,62 @@ def main():
 
     print(f"Ultron Core running at {server_url}. Launching native desktop window...")
 
-    # 3. Create native standalone desktop window via pywebview with straight WebKitGTK permissions
-    import webview
-    
-    # Straight permanent permissions for WebKitGTK
+    # 3. Create native standalone desktop window via direct GTK3 & WebKit2
+    import gi
+    gi.require_version('Gtk', '3.0')
+    gi.require_version('WebKit2', '4.1')
+    from gi.repository import Gtk, WebKit2, Gdk
+
+    Gtk.init_check(None)
+
+    win = Gtk.Window(title="ULTRON // Synthetic Command Matrix")
+    win.set_default_size(1320, 840)
+    win.set_size_request(980, 650)
+    win.set_position(Gtk.WindowPosition.CENTER)
+
+    # Apply dark theme styling
     try:
-        import gi
-        gi.require_version('Gtk', '3.0')
-        gi.require_version('WebKit2', '4.1')
-        from gi.repository import WebKit2
+        css = b"window { background-color: #050507; }"
+        style_provider = Gtk.CssProvider()
+        style_provider.load_from_data(css)
+        Gtk.StyleContext.add_provider_for_screen(
+            Gdk.Screen.get_default(),
+            style_provider,
+            Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+        )
+    except Exception:
+        pass
 
-        _orig_webview_init = WebKit2.WebView.__init__
-        def _patched_webview_init(self, *args, **kwargs):
-            _orig_webview_init(self, *args, **kwargs)
-            try:
-                s = self.get_settings()
-                s.set_enable_media_stream(True)
-                s.set_enable_mediasource(True)
-                s.set_enable_webaudio(True)
-                s.set_enable_webrtc(True)
-                s.set_media_playback_requires_user_gesture(False)
-            except Exception:
-                pass
+    webview = WebKit2.WebView()
 
-            def on_permission_request(web_view, request):
-                # Straight permanent permission grant for microphone & camera
-                try:
-                    request.allow()
-                    return True
-                except Exception:
-                    return False
+    s = webview.get_settings()
+    s.set_enable_media_stream(True)
+    s.set_enable_mediasource(True)
+    s.set_enable_webaudio(True)
+    s.set_enable_webrtc(True)
+    s.set_media_playback_requires_user_gesture(False)
+    s.set_enable_write_console_messages_to_stdout(True)
 
-            self.connect("permission-request", on_permission_request)
+    def on_permission_request(web_view, request):
+        # Straight permanent hardware permission grant for microphone & camera
+        print(f"[ULTRON HARDWARE PERMISSION]: Auto-granted access for {request}")
+        try:
+            request.allow()
+            return True
+        except Exception as ex:
+            print(f"[ULTRON PERMISSION ERROR]: {ex}")
+            return False
 
-        WebKit2.WebView.__init__ = _patched_webview_init
+    webview.connect("permission-request", on_permission_request)
 
-        from webview.platforms import gtk as webview_gtk
-        _orig_browser_view_init = webview_gtk.BrowserView.__init__
-        def _patched_browser_view_init(self, window):
-            _orig_browser_view_init(self, window)
-            try:
-                s = self.webview.get_settings()
-                s.set_enable_media_stream(True)
-                s.set_media_playback_requires_user_gesture(False)
-            except Exception:
-                pass
-        webview_gtk.BrowserView.__init__ = _patched_browser_view_init
-    except Exception as ex:
-        print(f"[Straight Permission Hook Info]: {ex}")
+    win.add(webview)
+    win.connect("destroy", Gtk.main_quit)
 
-    # Configure pywebview window
-    window = webview.create_window(
-        title="ULTRON // Synthetic Command Matrix",
-        url=server_url,
-        width=1320,
-        height=840,
-        min_size=(980, 650),
-        background_color="#050507",
-        text_select=False,
-    )
+    win.show_all()
+    webview.load_uri(server_url)
 
-    # Start native GUI loop
-    webview.start(gui="gtk", debug=False)
+    # Start native Gtk event loop
+    Gtk.main()
 
 if __name__ == "__main__":
     main()
