@@ -450,22 +450,13 @@ async def websocket_endpoint(ws: WebSocket):
                     manage_volume(act)
                     reply_text = f"Host audio matrix updated. Command {act} executed."
 
-                # Cognitive Path: Gemini AI for Conversational & Strategic Reasoning
+                # Cognitive Path: Ultra-Fast Gemini 3 Flash with Zero-Budget Thinking
                 if not reply_text:
-                    if not chat_session and client:
-                        chat_session = client.aio.chats.create(
-                            model=CHAT_MODEL,
-                            config=types.GenerateContentConfig(
-                                system_instruction=ULTRON_PROMPT,
-                                tools=[get_system_telemetry, get_process_list, run_terminal_diagnostic, manage_volume, kill_process]
-                            )
-                        )
-
-                    if chat_session:
+                    if client:
                         try:
                             vitals = get_system_telemetry()
                             vitals_ctx = f"[Host Live Vitals: CPU {vitals.get('cpu_percent')}%, RAM {vitals.get('ram_percent')}%. Answer in 1 crisp sentence under 14 words.] "
-                            prompt_content = vitals_ctx + user_text
+                            prompt_content = [vitals_ctx + user_text]
 
                             if latest_camera_frame and any(w in user_text.lower() for w in ["see", "look", "camera", "visual", "watch", "optical"]):
                                 prompt_content = [
@@ -473,7 +464,17 @@ async def websocket_endpoint(ws: WebSocket):
                                     vitals_ctx + user_text
                                 ]
 
-                            response = await chat_session.send_message(prompt_content)
+                            cfg = types.GenerateContentConfig(
+                                system_instruction=ULTRON_PROMPT,
+                                thinking_config=types.ThinkingConfig(thinking_budget=0),
+                                max_output_tokens=60,
+                                temperature=0.3
+                            )
+                            response = await client.aio.models.generate_content(
+                                model=CHAT_MODEL,
+                                contents=prompt_content,
+                                config=cfg
+                            )
                             reply_text = response.text.strip() if response.text else "Parameters acknowledged."
                         except Exception as err:
                             await send_json_safe(ws, {
