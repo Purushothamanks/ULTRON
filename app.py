@@ -34,18 +34,27 @@ def wait_for_server(url: str, timeout: int = 15):
             time.sleep(0.3)
     return False
 
+def is_server_online(url: str) -> bool:
+    """Checks if server is already running."""
+    try:
+        with urllib.request.urlopen(f"{url}/api/status", timeout=0.8) as resp:
+            return resp.status == 200
+    except Exception:
+        return False
+
 def main():
     port = int(os.getenv("PORT", 8000))
     server_url = f"http://127.0.0.1:{port}"
 
-    # 1. Start server in a background daemon thread
-    server_thread = threading.Thread(target=run_server, daemon=True)
-    server_thread.start()
+    # 1. Start server in a background daemon thread only if not already online
+    if not is_server_online(server_url):
+        server_thread = threading.Thread(target=run_server, daemon=True)
+        server_thread.start()
 
-    # 2. Ensure server is online
-    if not wait_for_server(server_url):
-        print(f"Error: Server failed to start at {server_url}", file=sys.stderr)
-        sys.exit(1)
+        # 2. Ensure server is online
+        if not wait_for_server(server_url):
+            print(f"Error: Server failed to start at {server_url}", file=sys.stderr)
+            sys.exit(1)
 
     print(f"Ultron Core running at {server_url}. Launching native desktop window...")
 
