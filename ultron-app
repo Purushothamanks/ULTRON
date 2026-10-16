@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -e
+
+DIR="/home/purushothaman/vision-console"
+cd "$DIR"
+
+# Free port 8000 if lingering
+fuser -k 8000/tcp 2>/dev/null || true
+
+# Execute native Ultron desktop application
+exec /home/purushothaman/vision_env/bin/python "$DIR/app.py" "$@"
